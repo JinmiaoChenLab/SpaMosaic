@@ -4,7 +4,7 @@ Mosaic integration, in which different datasets share part of the measured modal
 
 ## Installation
 ```
-git clone https://github.com/XiHuYan/SpaMosaic.git
+git clone https://github.com/JinmiaoChenLab/SpaMosaic.git
 cd SpaMosaic
 conda create -n SpaMosaic python=3.8.8
 conda activate SpaMosaic
