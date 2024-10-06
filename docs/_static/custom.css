@@ -1,0 +1,6 @@
+/* docs/_static/custom.css */
+.center-caption {
+    text-align: center;
+    display: block;
+    margin-top: 5px; /* Adjust this to change the spacing between the image and caption */
+}
