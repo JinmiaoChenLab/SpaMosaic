@@ -1,6 +1,6 @@
-# SpaMosaic: a computational framework for spatial mosaic integration
+# SpaMosaic: mosaic integration of spatial multi-omics datasets
 ## Overview
-Mosaic integration, in which different datasets share part of the measured modalities, poses great challenges in single-cell data analysis. Spatial mosaic integration considers mosaic integration within spatial context, demanding addtional spatial awareness. Here, we develop SpaMosaic, a method for spatial mosaic integration based on contrastive learning and light graph neural network. SpaMosaic can handle various tasks: including spatial horizontal integration, spatial vertical integration, spatial rectangular integration, spatial mosaic integration, and imputation for missing modalities. SpaMosaic is good at identifying smoothing spatial domains and is also computationally efficient. 
+With the advent of spatial multi-omics, we can mosaic integrate such datasets with partially overlapping modalities to construct higher dimensional views of the source tissue. SpaMosaic is a spatial multi-omics mosaic integration tool that employs contrastive learning and graph neural networks to construct a modality-agnostic and batch-corrected latent space suited for analyses like spatial domain identification and imputing missing omes. 
 
 ## Installation
 ```
@@ -20,13 +20,16 @@ python setup.py install
 R package `mclust` is needed to perform clustering and make sure it installed in a R environment.  
 
 ## Tutorial
-* [`horizontal integration`](./integration_examples/horizontal) 
+<!-- * [`horizontal integration`](./integration_examples/horizontal) 
 * [`vertical integration`](./integration_examples/vertical) 
 * [`mosaic integration`](./integration_examples/mosaic) 
-* [`imputation `](./imputation_examples/) 
+* [`imputation `](./imputation_examples/)  -->
+
+We provided detailed tutorials on applying SpaMosaic to various integration or imputation tasks. Please refer to [https://spamosaic.readthedocs.io/en/latest/](https://spamosaic.readthedocs.io/en/latest/).
+
 
 ## Data
-Public datasets
+Source of public datasets
 1. Mouse embryonic brain dataset: [`three slices`](http://www.biosino.org/node/project/detail/OEP003285) 
 2. Mouse postnatal brain dataset (rna+atac): {[`slice 1, 2`](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE205055)}, {[`slice 3`](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE171943)}
 3. Mouse postnatal brain dataset (rna+h3k4me3): {[`slice 1, 2`](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE205055)}, {[`slice 3`](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE165217)}
@@ -35,9 +38,9 @@ Public datasets
 6. Mouse embryo: {[`slice 1`](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE205055)}, {[`slice 2,3,4`](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE171943)}
 7. Five-modal mouse brain dataset (rna+atac+histone): [`four slices`](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE205055)
 
-We have organized the simulation datasets, in-house datasets and public datasets into [`h5ad`](https://zenodo.org/uploads/12654113) files. 
+We have compiled the simulation, in-house, and public datasets into h5ad files. Please refer to [zenodo](https://zenodo.org/uploads/12654113). 
 
 ## Reproduce other methods
-We compared SpaMosaic with other methods, including [`CLUE`](https://github.com/openproblems-bio/neurips2021_multimodal_topmethods/tree/main/src/match_modality/methods/clue), [`Cobolt`](https://github.com/epurdom/cobolt), [`scMoMaT`](https://github.com/PeterZZQ/scMoMaT), [`StabMap`](https://github.com/MarioniLab/StabMap), [`MIDAS`](https://sc-midas-docs.readthedocs.io/en/latest/mosaic.html), [`TotalVI`](https://docs.scvi-tools.org/en/stable/tutorials/notebooks/multimodal/totalVI.html), [`MultiVI`](https://docs.scvi-tools.org/en/stable/tutorials/notebooks/multimodal/MultiVI_tutorial.html), [`Babel`](https://github.com/OmicsML/dance/tree/main/examples/multi_modality/predict_modality/babel.py). The reproducing notebooks can be found at [`notebooks`](https://github.com/XiHuYan/Spamosaic-notebooks)
+We compared SpaMosaic with other methods, including [`CLUE`](https://github.com/openproblems-bio/neurips2021_multimodal_topmethods/tree/main/src/match_modality/methods/clue), [`Cobolt`](https://github.com/epurdom/cobolt), [`scMoMaT`](https://github.com/PeterZZQ/scMoMaT), [`StabMap`](https://github.com/MarioniLab/StabMap), [`MIDAS`](https://sc-midas-docs.readthedocs.io/en/latest/mosaic.html), [`TotalVI`](https://docs.scvi-tools.org/en/stable/tutorials/notebooks/multimodal/totalVI.html), [`MultiVI`](https://docs.scvi-tools.org/en/stable/tutorials/notebooks/multimodal/MultiVI_tutorial.html), [`Babel`](https://github.com/OmicsML/dance/tree/main/examples/multi_modality/predict_modality/babel.py). The reproducing notebooks can be found at [`notebooks`](https://github.com/XiHuYan/Spamosaic-notebooks).
 
 

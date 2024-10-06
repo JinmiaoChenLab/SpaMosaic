@@ -7,9 +7,9 @@ setup(
     include_package_data=True,
     url='',
     license='MIT',
-    author='Jin Zuoyou',
-    author_email='0921160212@csu.edu.cn',
-    description='A computational framework for spatial mosaic integration.',
+    author='Jinmiao Lab',
+    author_email='204707014@csu.edu.cn',
+    description='Mosaic integration of spatial multi-omics with SpaMosaic.',
     package_data={
         'spamosaic': ['configs/*.yaml']
     },

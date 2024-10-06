@@ -6,9 +6,9 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'SpaMosaicTutorial'
-copyright = '2024, yanxuhua'
-author = 'yanxuhua'
+project = 'SpaMosaic'
+copyright = '2024, Jinmiao Lab'
+author = 'Jinmiao Lab'
 release = 'v1.0'
 
 # -- General configuration ---------------------------------------------------
