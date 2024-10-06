@@ -1,7 +1,7 @@
 Datasets
 ========
 
-We provide the processed data files used in our paper:
+We provided the processed h5ad files used in all tutorials:
 
 .. list-table:: 
    :header-rows: 1

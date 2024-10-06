@@ -29,7 +29,7 @@ We provided detailed tutorials on applying SpaMosaic to various integration or i
 
 
 ## Data
-Source of public datasets
+Source of public datasets:
 1. Mouse embryonic brain dataset: [`three slices`](http://www.biosino.org/node/project/detail/OEP003285) 
 2. Mouse postnatal brain dataset (rna+atac): {[`slice 1, 2`](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE205055)}, {[`slice 3`](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE171943)}
 3. Mouse postnatal brain dataset (rna+h3k4me3): {[`slice 1, 2`](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE205055)}, {[`slice 3`](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE165217)}
