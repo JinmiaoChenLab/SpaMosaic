@@ -34,4 +34,4 @@ Set up:
    python setup.py install
 
 .. note::
-   SpaMosaic performed better with the mclust algorithm. Make sure it is installed in your R environment.
+   SpaMosaic works better with the mclust algorithm. Make sure it is installed in your R environment.
