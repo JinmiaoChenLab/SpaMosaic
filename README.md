@@ -27,7 +27,6 @@ R package `mclust` is needed to perform clustering and make sure it installed in
 
 We provided detailed tutorials on applying SpaMosaic to various integration or imputation tasks. Please refer to [https://spamosaic.readthedocs.io/en/latest/](https://spamosaic.readthedocs.io/en/latest/).
 
-
 ## Data
 Source of public datasets:
 1. Mouse embryonic brain dataset: [`three slices`](http://www.biosino.org/node/project/detail/OEP003285) 
@@ -40,7 +39,9 @@ Source of public datasets:
 
 We have compiled the simulation, in-house, and public datasets into h5ad files. Please refer to [zenodo](https://zenodo.org/uploads/12654113). 
 
-## Reproduce other methods
-We compared SpaMosaic with other methods, including [`CLUE`](https://github.com/openproblems-bio/neurips2021_multimodal_topmethods/tree/main/src/match_modality/methods/clue), [`Cobolt`](https://github.com/epurdom/cobolt), [`scMoMaT`](https://github.com/PeterZZQ/scMoMaT), [`StabMap`](https://github.com/MarioniLab/StabMap), [`MIDAS`](https://sc-midas-docs.readthedocs.io/en/latest/mosaic.html), [`TotalVI`](https://docs.scvi-tools.org/en/stable/tutorials/notebooks/multimodal/totalVI.html), [`MultiVI`](https://docs.scvi-tools.org/en/stable/tutorials/notebooks/multimodal/MultiVI_tutorial.html), [`Babel`](https://github.com/OmicsML/dance/tree/main/examples/multi_modality/predict_modality/babel.py). The reproducing notebooks can be found at [`notebooks`](https://github.com/XiHuYan/Spamosaic-notebooks).
+## Reproduce results presented in manuscript
+To reproduce our SpaMosaic's results, please visit [`reproduce`](./reproduce/) folder.
+
+To reproduce compared methods' results, including [`CLUE`](https://github.com/openproblems-bio/neurips2021_multimodal_topmethods/tree/main/src/match_modality/methods/clue), [`Cobolt`](https://github.com/epurdom/cobolt), [`scMoMaT`](https://github.com/PeterZZQ/scMoMaT), [`StabMap`](https://github.com/MarioniLab/StabMap), [`MIDAS`](https://sc-midas-docs.readthedocs.io/en/latest/mosaic.html), [`TotalVI`](https://docs.scvi-tools.org/en/stable/tutorials/notebooks/multimodal/totalVI.html), [`MultiVI`](https://docs.scvi-tools.org/en/stable/tutorials/notebooks/multimodal/MultiVI_tutorial.html), [`Babel`](https://github.com/OmicsML/dance/tree/main/examples/multi_modality/predict_modality/babel.py), please visit [`https://github.com/XiHuYan/Spamosaic-notebooks`](https://github.com/XiHuYan/Spamosaic-notebooks).
 
 
