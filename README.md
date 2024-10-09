@@ -40,7 +40,7 @@ Source of public datasets:
 We have compiled the simulation, in-house, and public datasets into h5ad files. Please refer to [zenodo](https://zenodo.org/uploads/12654113). 
 
 ## Reproduce results presented in manuscript
-To reproduce our SpaMosaic's results, please visit [`reproduce`](./reproduce/) folder.
+To reproduce SpaMosaic's results, please visit [`reproduce`](./reproduce/) folder.
 
 To reproduce compared methods' results, including [`CLUE`](https://github.com/openproblems-bio/neurips2021_multimodal_topmethods/tree/main/src/match_modality/methods/clue), [`Cobolt`](https://github.com/epurdom/cobolt), [`scMoMaT`](https://github.com/PeterZZQ/scMoMaT), [`StabMap`](https://github.com/MarioniLab/StabMap), [`MIDAS`](https://sc-midas-docs.readthedocs.io/en/latest/mosaic.html), [`TotalVI`](https://docs.scvi-tools.org/en/stable/tutorials/notebooks/multimodal/totalVI.html), [`MultiVI`](https://docs.scvi-tools.org/en/stable/tutorials/notebooks/multimodal/MultiVI_tutorial.html), [`Babel`](https://github.com/OmicsML/dance/tree/main/examples/multi_modality/predict_modality/babel.py), please visit [`https://github.com/XiHuYan/Spamosaic-notebooks`](https://github.com/XiHuYan/Spamosaic-notebooks).
 
