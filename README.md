@@ -3,6 +3,7 @@
 With the advent of spatial multi-omics, we can mosaic integrate such datasets with partially overlapping modalities to construct higher dimensional views of the source tissue. SpaMosaic is a spatial multi-omics mosaic integration tool that employs contrastive learning and graph neural networks to construct a modality-agnostic and batch-corrected latent space suited for analyses like spatial domain identification and imputing missing omes. 
 
 ## Installation
+We tested our code on a server running Ubuntu 18.04.5 LTS, equipped with 4 NVIDIA A6000 GPUs. The installation process typically takes 10–15 minutes.
 ```
 git clone https://github.com/JinmiaoChenLab/SpaMosaic.git
 cd SpaMosaic
