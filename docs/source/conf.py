@@ -8,10 +8,17 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('../../'))
+sys.path.insert(0, os.path.abspath('../../spamosaic'))
 
 project = 'spamosaic'
 author = 'Jinmiao Lab'
 release = 'v1.0.3'
+
+autodoc_mock_imports = [
+    'torch',
+    'torch.nn',
+    'torch.nn.functional', 
+]
 
 extensions = [
     "sphinx.ext.autodoc",
@@ -35,3 +42,5 @@ exclude_patterns = []
 html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 html_css_files = ['custom.css']
+
+suppress_warnings = ['autodoc.import_object']
