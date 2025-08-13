@@ -22,7 +22,8 @@ autodoc_mock_imports = [
     'torch_scatter',
     'torch-sparse',
     'torch-cluster', 
-    'torch-spline-conv'
+    'torch-spline-conv',
+    'harmony'
 ]
 
 extensions = [

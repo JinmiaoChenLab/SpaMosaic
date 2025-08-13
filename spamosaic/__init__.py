@@ -1,4 +1,7 @@
 import spamosaic.architectures.wlgcn
+import spamosaic.architectures.gat
+import spamosaic.architectures.hg_lgcn
+import spamosaic.architectures.hgt
 import spamosaic.configs
 import spamosaic.build_graph
 import spamosaic.framework
