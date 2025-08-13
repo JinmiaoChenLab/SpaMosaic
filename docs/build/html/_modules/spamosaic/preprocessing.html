@@ -1,0 +1,545 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>spamosaic.preprocessing &mdash; spamosaic v1.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=9af0dbfa" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=393fe109"></script>
+      <script src="../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            spamosaic
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../spamosaic.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dataset.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../credits.html">Credits</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">spamosaic</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">spamosaic.preprocessing</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for spamosaic.preprocessing</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="c1"># os.environ[&#39;CUDA_VISIBLE_DEVICES&#39;] = &#39;3&#39;</span>
+<span class="kn">import</span> <span class="nn">sklearn</span>
+<span class="kn">import</span> <span class="nn">anndata</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">scanpy</span> <span class="k">as</span> <span class="nn">sc</span>
+<span class="kn">import</span> <span class="nn">scipy.sparse</span>
+<span class="kn">import</span> <span class="nn">sklearn.decomposition</span>
+<span class="kn">import</span> <span class="nn">sklearn.feature_extraction.text</span>
+<span class="kn">import</span> <span class="nn">sklearn.neighbors</span>
+<span class="kn">import</span> <span class="nn">sklearn.preprocessing</span>
+<span class="kn">import</span> <span class="nn">sklearn.utils.extmath</span>
+<span class="kn">from</span> <span class="nn">harmony</span> <span class="kn">import</span> <span class="n">harmonize</span>
+
+<span class="kn">from</span> <span class="nn">spamosaic.utils</span> <span class="kn">import</span> <span class="n">split_adata_ob</span>
+
+<div class="viewcode-block" id="sparse_log1p_scale"><a class="viewcode-back" href="../../api/spamosaic.preprocessing.sparse_log1p_scale.html#spamosaic.preprocessing.sparse_log1p_scale">[docs]</a><span class="k">def</span> <span class="nf">sparse_log1p_scale</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mf">1e4</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Apply log1p transformation to sparse or dense matrix, scaled by a factor.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    X : Union[scipy.sparse.spmatrix, np.ndarray]</span>
+<span class="sd">        Input expression matrix.</span>
+<span class="sd">    scale : float, default=1e4</span>
+<span class="sd">        Scaling factor applied before log1p.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Transformed matrix (same type as input)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">issparse</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">X</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">data</span> <span class="o">*</span> <span class="n">scale</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">X</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="n">X</span> <span class="o">*</span> <span class="n">scale</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="tfidfTransformer"><a class="viewcode-back" href="../../api/spamosaic.preprocessing.tfidfTransformer.html#spamosaic.preprocessing.tfidfTransformer">[docs]</a><span class="k">class</span> <span class="nc">tfidfTransformer</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    TF-IDF Transformer for sparse count data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">idf</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fitted</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="tfidfTransformer.fit"><a class="viewcode-back" href="../../api/spamosaic.preprocessing.html#spamosaic.preprocessing.tfidfTransformer.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute IDF vector from input data.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : array-like or sparse matrix</span>
+<span class="sd">            Count matrix.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">idf</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1e-8</span><span class="o">+</span><span class="n">X</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fitted</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="tfidfTransformer.transform"><a class="viewcode-back" href="../../api/spamosaic.preprocessing.html#spamosaic.preprocessing.tfidfTransformer.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Apply TF-IDF transformation using precomputed IDF.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : array-like or sparse matrix</span>
+<span class="sd">            Count matrix to transform.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Transformed matrix.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitted</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Transformer was not fitted on any data&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">issparse</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+            <span class="n">tf</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1e-8</span><span class="o">+</span><span class="n">X</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)))</span>
+            <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">idf</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tf</span> <span class="o">=</span> <span class="n">X</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1e-8</span><span class="o">+</span><span class="n">X</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">tf</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">idf</span></div>
+
+<div class="viewcode-block" id="tfidfTransformer.fit_transform"><a class="viewcode-back" href="../../api/spamosaic.preprocessing.html#spamosaic.preprocessing.tfidfTransformer.fit_transform">[docs]</a>    <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fit to data, then transform it.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X : array-like or sparse matrix</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Transformed matrix.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span></div></div>
+
+<span class="c1"># optional, other reasonable preprocessing steps also ok</span>
+<div class="viewcode-block" id="lsiTransformer"><a class="viewcode-back" href="../../api/spamosaic.preprocessing.lsiTransformer.html#spamosaic.preprocessing.lsiTransformer">[docs]</a><span class="k">class</span> <span class="nc">lsiTransformer</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Latent Semantic Indexing (LSI) pipeline for dimensionality reduction.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_components : int</span>
+<span class="sd">        Number of SVD components.</span>
+<span class="sd">    drop_first : bool</span>
+<span class="sd">        Whether to drop the first principal component.</span>
+<span class="sd">    use_highly_variable : bool or None</span>
+<span class="sd">        Whether to subset to highly variable features.</span>
+<span class="sd">    log : bool</span>
+<span class="sd">        Whether to apply log1p transformation.</span>
+<span class="sd">    norm : bool</span>
+<span class="sd">        Whether to normalize features.</span>
+<span class="sd">    z_score : bool</span>
+<span class="sd">        Whether to z-score features.</span>
+<span class="sd">    tfidf : bool</span>
+<span class="sd">        Whether to apply TF-IDF normalization.</span>
+<span class="sd">    svd : bool</span>
+<span class="sd">        Whether to apply SVD transformation.</span>
+<span class="sd">    use_counts : bool</span>
+<span class="sd">        Use `.layers[&#39;counts&#39;]` instead of `.X` for data.</span>
+<span class="sd">    pcaAlgo : str</span>
+<span class="sd">        SVD backend.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">n_components</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="n">drop_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_highly_variable</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">z_score</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">tfidf</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">svd</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_counts</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pcaAlgo</span><span class="o">=</span><span class="s1">&#39;arpack&#39;</span>
+    <span class="p">):</span>  
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">drop_first</span> <span class="o">=</span> <span class="n">drop_first</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_components</span> <span class="o">=</span> <span class="n">n_components</span> <span class="o">+</span> <span class="n">drop_first</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_highly_variable</span> <span class="o">=</span> <span class="n">use_highly_variable</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">=</span> <span class="n">log</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">norm</span> <span class="o">=</span> <span class="n">norm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">z_score</span> <span class="o">=</span> <span class="n">z_score</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">svd</span> <span class="o">=</span> <span class="n">svd</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tfidf</span> <span class="o">=</span> <span class="n">tfidf</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_counts</span> <span class="o">=</span> <span class="n">use_counts</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">tfidfTransformer</span> <span class="o">=</span> <span class="n">tfidfTransformer</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">normalizer</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">preprocessing</span><span class="o">.</span><span class="n">Normalizer</span><span class="p">(</span><span class="n">norm</span><span class="o">=</span><span class="s2">&quot;l1&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pcaTransformer</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">decomposition</span><span class="o">.</span><span class="n">TruncatedSVD</span><span class="p">(</span>
+            <span class="n">n_components</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_components</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">777</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="n">pcaAlgo</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fitted</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="lsiTransformer.fit"><a class="viewcode-back" href="../../api/spamosaic.preprocessing.html#spamosaic.preprocessing.lsiTransformer.fit">[docs]</a>    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">adata</span><span class="p">:</span> <span class="n">anndata</span><span class="o">.</span><span class="n">AnnData</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fit the transformer on AnnData object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_highly_variable</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">use_highly_variable</span> <span class="o">=</span> <span class="s2">&quot;highly_variable&quot;</span> <span class="ow">in</span> <span class="n">adata</span><span class="o">.</span><span class="n">var</span>
+        <span class="n">adata_use</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">adata</span><span class="p">[:,</span> <span class="n">adata</span><span class="o">.</span><span class="n">var</span><span class="p">[</span><span class="s2">&quot;highly_variable&quot;</span><span class="p">]]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_highly_variable</span>
+            <span class="k">else</span> <span class="n">adata</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_counts</span><span class="p">:</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">adata_use</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="s1">&#39;counts&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">adata_use</span><span class="o">.</span><span class="n">X</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tfidf</span><span class="p">:</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tfidfTransformer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="c1"># if scipy.sparse.issparse(X):</span>
+        <span class="c1">#     X = X.A.astype(&quot;float32&quot;)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm</span><span class="p">:</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalizer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">:</span>
+            <span class="c1"># X = np.log1p(X * 1e4)    # L1-norm and target_sum=1e4 and log1p</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">sparse_log1p_scale</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="mf">1e4</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pcaTransformer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fitted</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="lsiTransformer.transform"><a class="viewcode-back" href="../../api/spamosaic.preprocessing.html#spamosaic.preprocessing.lsiTransformer.transform">[docs]</a>    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">adata</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Transform AnnData using fitted transformer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">fitted</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Transformer was not fitted on any data&quot;</span><span class="p">)</span>
+        <span class="n">adata_use</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">adata</span><span class="p">[:,</span> <span class="n">adata</span><span class="o">.</span><span class="n">var</span><span class="p">[</span><span class="s2">&quot;highly_variable&quot;</span><span class="p">]]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_highly_variable</span>
+            <span class="k">else</span> <span class="n">adata</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_counts</span><span class="p">:</span>
+            <span class="n">X_pp</span> <span class="o">=</span> <span class="n">adata_use</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="s1">&#39;counts&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">X_pp</span> <span class="o">=</span> <span class="n">adata_use</span><span class="o">.</span><span class="n">X</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tfidf</span><span class="p">:</span>
+            <span class="n">X_pp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tfidfTransformer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_pp</span><span class="p">)</span>
+        <span class="c1"># if scipy.sparse.issparse(X_pp):</span>
+        <span class="c1">#     X_pp = X_pp.A.astype(&quot;float32&quot;)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm</span><span class="p">:</span>
+            <span class="n">X_pp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalizer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_pp</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">:</span>
+            <span class="c1"># X_pp = np.log1p(X_pp * 1e4)</span>
+            <span class="n">X_pp</span> <span class="o">=</span> <span class="n">sparse_log1p_scale</span><span class="p">(</span><span class="n">X_pp</span><span class="p">,</span> <span class="mf">1e4</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">svd</span><span class="p">:</span>
+            <span class="n">X_pp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pcaTransformer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_pp</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_score</span><span class="p">:</span>
+            <span class="n">X_pp</span> <span class="o">-=</span> <span class="n">X_pp</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">X_pp</span> <span class="o">/=</span> <span class="p">(</span><span class="mf">1e-8</span><span class="o">+</span><span class="n">X_pp</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ddof</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+        <span class="n">pp_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">X_pp</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">adata_use</span><span class="o">.</span><span class="n">obs_names</span><span class="p">)</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span>
+            <span class="p">:,</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">drop_first</span><span class="p">)</span> <span class="p">:</span>
+        <span class="p">]</span>
+        <span class="k">return</span> <span class="n">pp_df</span></div>
+
+<div class="viewcode-block" id="lsiTransformer.fit_transform"><a class="viewcode-back" href="../../api/spamosaic.preprocessing.html#spamosaic.preprocessing.lsiTransformer.fit_transform">[docs]</a>    <span class="k">def</span> <span class="nf">fit_transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">adata</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fit and transform AnnData.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">adata</span><span class="p">)</span></div></div>
+   
+<span class="c1"># CLR-normalization     </span>
+<div class="viewcode-block" id="clr_normalize"><a class="viewcode-back" href="../../api/spamosaic.preprocessing.clr_normalize.html#spamosaic.preprocessing.clr_normalize">[docs]</a><span class="k">def</span> <span class="nf">clr_normalize</span><span class="p">(</span><span class="n">adata</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Perform centered log-ratio (CLR) normalization on count data.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    adata : AnnData</span>
+<span class="sd">        Input data with count matrix in `.X`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    adata : AnnData</span>
+<span class="sd">        Normalized AnnData object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">seurat_clr</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">x</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]))</span>
+        <span class="n">exp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">s</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="n">x</span> <span class="o">/</span> <span class="n">exp</span><span class="p">)</span>
+
+    <span class="n">adata</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">apply_along_axis</span><span class="p">(</span>
+        <span class="n">seurat_clr</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">A</span> <span class="k">if</span> <span class="n">scipy</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">issparse</span><span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">X</span><span class="p">)</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">adata</span><span class="o">.</span><span class="n">X</span><span class="p">))</span>
+    <span class="p">)</span>
+    <span class="c1"># sc.pp.pca(adata, n_comps=min(50, adata.n_vars-1))</span>
+    <span class="k">return</span> <span class="n">adata</span></div>
+
+<div class="viewcode-block" id="harmony"><a class="viewcode-back" href="../../api/spamosaic.preprocessing.harmony.html#spamosaic.preprocessing.harmony">[docs]</a><span class="k">def</span> <span class="nf">harmony</span><span class="p">(</span><span class="n">latent</span><span class="p">,</span> <span class="n">batch_labels</span><span class="p">,</span> <span class="n">use_gpu</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Batch correction using Harmony.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    latent : np.ndarray</span>
+<span class="sd">        Low-dimensional representation (e.g., PCA).</span>
+<span class="sd">    batch_labels : list or array</span>
+<span class="sd">        Corresponding batch annotations.</span>
+<span class="sd">    use_gpu : bool, default=True</span>
+<span class="sd">        Whether to use GPU acceleration.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.ndarray</span>
+<span class="sd">        Batch-corrected latent representation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df_batches</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">batch_labels</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;batch&#39;</span><span class="p">])</span>
+    <span class="n">bc_latent</span> <span class="o">=</span> <span class="n">harmonize</span><span class="p">(</span>
+        <span class="n">latent</span><span class="p">,</span> <span class="n">df_batches</span><span class="p">,</span> <span class="n">batch_key</span><span class="o">=</span><span class="s2">&quot;batch&quot;</span><span class="p">,</span> <span class="n">use_gpu</span><span class="o">=</span><span class="n">use_gpu</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">bc_latent</span></div>
+
+<div class="viewcode-block" id="RNA_preprocess"><a class="viewcode-back" href="../../api/spamosaic.preprocessing.RNA_preprocess.html#spamosaic.preprocessing.RNA_preprocess">[docs]</a><span class="k">def</span> <span class="nf">RNA_preprocess</span><span class="p">(</span>
+        <span class="n">rna_ads</span><span class="p">,</span> <span class="n">batch_corr</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">favor</span><span class="o">=</span><span class="s1">&#39;adapted&#39;</span><span class="p">,</span> <span class="n">n_hvg</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">lognorm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+        <span class="n">scale</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">n_comps</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">batch_key</span><span class="o">=</span><span class="s1">&#39;src&#39;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s1">&#39;dimred_bc&#39;</span><span class="p">,</span> <span class="n">return_hvf</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Preprocessing pipeline for RNA modality.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    rna_ads : list of AnnData</span>
+<span class="sd">        RNA modality per batch.</span>
+<span class="sd">    batch_corr : bool</span>
+<span class="sd">        Whether to perform batch correction.</span>
+<span class="sd">    favor : {&#39;adapted&#39;, &#39;scanpy&#39;}</span>
+<span class="sd">        Which pipeline to use.</span>
+<span class="sd">    n_hvg : int</span>
+<span class="sd">        Number of highly variable genes.</span>
+<span class="sd">    lognorm : bool</span>
+<span class="sd">        Whether to apply log-normalization.</span>
+<span class="sd">    scale : bool</span>
+<span class="sd">        Whether to scale features.</span>
+<span class="sd">    n_comps : int</span>
+<span class="sd">        Number of output components.</span>
+<span class="sd">    batch_key : str</span>
+<span class="sd">        Key in `.obs` indicating batch identity.</span>
+<span class="sd">    key : str</span>
+<span class="sd">        Key to store result in `.obsm`.</span>
+<span class="sd">    return_hvf : bool</span>
+<span class="sd">        If True, return indices of selected HVGs.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    If return_hvf is True, returns tuple of (gene names, indices).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">measured_ads</span> <span class="o">=</span> <span class="p">[</span><span class="n">ad</span> <span class="k">for</span> <span class="n">ad</span> <span class="ow">in</span> <span class="n">rna_ads</span> <span class="k">if</span> <span class="n">ad</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="n">ad_concat</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">measured_ads</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">favor</span><span class="o">==</span><span class="s1">&#39;scanpy&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">lognorm</span><span class="p">:</span>
+            <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">normalize_total</span><span class="p">(</span><span class="n">ad_concat</span><span class="p">,</span> <span class="n">target_sum</span><span class="o">=</span><span class="mf">1e4</span><span class="p">)</span>
+            <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="n">ad_concat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n_hvg</span><span class="p">:</span>
+            <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">highly_variable_genes</span><span class="p">(</span><span class="n">ad_concat</span><span class="p">,</span> <span class="n">n_top_genes</span><span class="o">=</span><span class="n">n_hvg</span><span class="p">,</span> <span class="n">batch_key</span><span class="o">=</span><span class="n">batch_key</span><span class="p">)</span>
+            <span class="n">ad_concat</span> <span class="o">=</span> <span class="n">ad_concat</span><span class="p">[:,</span> <span class="n">ad_concat</span><span class="o">.</span><span class="n">var</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;highly_variable&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">scale</span><span class="p">:</span> 
+            <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">ad_concat</span><span class="p">)</span>
+        <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">pca</span><span class="p">(</span><span class="n">ad_concat</span><span class="p">,</span> <span class="n">n_comps</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span><span class="n">n_comps</span><span class="p">,</span> <span class="n">ad_concat</span><span class="o">.</span><span class="n">n_vars</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">tmp_key</span> <span class="o">=</span> <span class="s1">&#39;X_pca&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">n_hvg</span> <span class="o">=</span> <span class="n">n_hvg</span> <span class="k">if</span> <span class="n">n_hvg</span> <span class="k">else</span> <span class="n">ad_concat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">highly_variable_genes</span><span class="p">(</span><span class="n">ad_concat</span><span class="p">,</span> <span class="n">flavor</span><span class="o">=</span><span class="s1">&#39;seurat_v3&#39;</span><span class="p">,</span> <span class="n">n_top_genes</span><span class="o">=</span><span class="n">n_hvg</span><span class="p">,</span> <span class="n">batch_key</span><span class="o">=</span><span class="n">batch_key</span><span class="p">)</span>
+        <span class="n">transformer</span> <span class="o">=</span> <span class="n">lsiTransformer</span><span class="p">(</span>
+            <span class="n">n_components</span><span class="o">=</span><span class="n">n_comps</span><span class="p">,</span> <span class="n">drop_first</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+            <span class="n">z_score</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tfidf</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">svd</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">pcaAlgo</span><span class="o">=</span><span class="s1">&#39;arpack&#39;</span>
+        <span class="p">)</span>
+        <span class="n">ad_concat</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="s1">&#39;X_lsi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ad_concat</span><span class="p">[:,</span> <span class="n">ad_concat</span><span class="o">.</span><span class="n">var</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;highly_variable&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()])</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">tmp_key</span> <span class="o">=</span> <span class="s1">&#39;X_lsi&#39;</span>
+    
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">measured_ads</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">batch_corr</span><span class="p">:</span>
+        <span class="n">ad_concat</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">harmony</span><span class="p">(</span>
+            <span class="n">ad_concat</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="n">tmp_key</span><span class="p">],</span> 
+            <span class="n">ad_concat</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">batch_key</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">(),</span> 
+            <span class="n">use_gpu</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ad_concat</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">ad_concat</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="n">tmp_key</span><span class="p">]</span>
+    <span class="n">split_adata_ob</span><span class="p">([</span><span class="n">ad</span> <span class="k">for</span> <span class="n">ad</span> <span class="ow">in</span> <span class="n">rna_ads</span> <span class="k">if</span> <span class="n">ad</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">],</span> <span class="n">ad_concat</span><span class="p">,</span> <span class="n">ob</span><span class="o">=</span><span class="s1">&#39;obsm&#39;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">n_hvg</span> <span class="ow">and</span> <span class="n">return_hvf</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ad_concat</span><span class="o">.</span><span class="n">var</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;highly_variable&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">ad_concat</span><span class="o">.</span><span class="n">var</span><span class="p">[</span><span class="s1">&#39;highly_variable&#39;</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="ADT_preprocess"><a class="viewcode-back" href="../../api/spamosaic.preprocessing.ADT_preprocess.html#spamosaic.preprocessing.ADT_preprocess">[docs]</a><span class="k">def</span> <span class="nf">ADT_preprocess</span><span class="p">(</span>
+        <span class="n">adt_ads</span><span class="p">,</span> <span class="n">batch_corr</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">favor</span><span class="o">=</span><span class="s1">&#39;clr&#39;</span><span class="p">,</span> <span class="n">lognorm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
+        <span class="n">n_comps</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">batch_key</span><span class="o">=</span><span class="s1">&#39;src&#39;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s1">&#39;dimred_bc&#39;</span>
+    <span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Preprocessing pipeline for ADT (protein) modality.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    adt_ads : list of AnnData</span>
+<span class="sd">        ADT modality per batch.</span>
+<span class="sd">    batch_corr : bool</span>
+<span class="sd">        Whether to perform batch correction.</span>
+<span class="sd">    favor : {&#39;clr&#39;, &#39;lognorm&#39;}</span>
+<span class="sd">        Whether to use CLR or log-normalization.</span>
+<span class="sd">    lognorm : bool</span>
+<span class="sd">        Apply log-normalization (if favor=&#39;lognorm&#39;).</span>
+<span class="sd">    scale : bool</span>
+<span class="sd">        Whether to scale features.</span>
+<span class="sd">    n_comps : int</span>
+<span class="sd">        Number of components for PCA.</span>
+<span class="sd">    batch_key : str</span>
+<span class="sd">        Key for batch annotation.</span>
+<span class="sd">    key : str</span>
+<span class="sd">        Key to store reduced dimension result.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">measured_ads</span> <span class="o">=</span> <span class="p">[</span><span class="n">ad</span> <span class="k">for</span> <span class="n">ad</span> <span class="ow">in</span> <span class="n">adt_ads</span> <span class="k">if</span> <span class="n">ad</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="n">ad_concat</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">measured_ads</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">favor</span><span class="o">==</span><span class="s1">&#39;clr&#39;</span><span class="p">:</span>
+        <span class="n">ad_concat</span> <span class="o">=</span> <span class="n">clr_normalize</span><span class="p">(</span><span class="n">ad_concat</span><span class="p">)</span>
+        <span class="c1"># if scale: sc.pp.scale(ad_concat)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">lognorm</span><span class="p">:</span>
+            <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">normalize_total</span><span class="p">(</span><span class="n">ad_concat</span><span class="p">,</span> <span class="n">target_sum</span><span class="o">=</span><span class="mf">1e4</span><span class="p">)</span>
+            <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">log1p</span><span class="p">(</span><span class="n">ad_concat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">scale</span><span class="p">:</span> <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">ad_concat</span><span class="p">)</span>
+            
+    <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">pca</span><span class="p">(</span><span class="n">ad_concat</span><span class="p">,</span> <span class="n">n_comps</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span><span class="n">n_comps</span><span class="p">,</span> <span class="n">ad_concat</span><span class="o">.</span><span class="n">n_vars</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">measured_ads</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">batch_corr</span><span class="p">:</span>
+        <span class="n">ad_concat</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">harmony</span><span class="p">(</span><span class="n">ad_concat</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="s1">&#39;X_pca&#39;</span><span class="p">],</span> <span class="n">ad_concat</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">batch_key</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">(),</span> <span class="n">use_gpu</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ad_concat</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">ad_concat</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="s1">&#39;X_pca&#39;</span><span class="p">]</span>
+    <span class="n">split_adata_ob</span><span class="p">([</span><span class="n">ad</span> <span class="k">for</span> <span class="n">ad</span> <span class="ow">in</span> <span class="n">adt_ads</span> <span class="k">if</span> <span class="n">ad</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">],</span> <span class="n">ad_concat</span><span class="p">,</span> <span class="n">ob</span><span class="o">=</span><span class="s1">&#39;obsm&#39;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Epigenome_preprocess"><a class="viewcode-back" href="../../api/spamosaic.preprocessing.Epigenome_preprocess.html#spamosaic.preprocessing.Epigenome_preprocess">[docs]</a><span class="k">def</span> <span class="nf">Epigenome_preprocess</span><span class="p">(</span>
+        <span class="n">epi_ads</span><span class="p">,</span> <span class="n">batch_corr</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">n_peak</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span> 
+        <span class="n">n_comps</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">batch_key</span><span class="o">=</span><span class="s1">&#39;src&#39;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s1">&#39;dimred_bc&#39;</span><span class="p">,</span> <span class="n">return_hvf</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Preprocessing pipeline for epigenomic modality (e.g. ATAC-seq).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    epi_ads : list of AnnData</span>
+<span class="sd">        Epigenomic modality per batch.</span>
+<span class="sd">    batch_corr : bool</span>
+<span class="sd">        Whether to apply Harmony batch correction.</span>
+<span class="sd">    n_peak : int</span>
+<span class="sd">        Number of variable peaks to keep.</span>
+<span class="sd">    n_comps : int</span>
+<span class="sd">        Number of LSI components.</span>
+<span class="sd">    batch_key : str</span>
+<span class="sd">        Batch identifier key.</span>
+<span class="sd">    key : str</span>
+<span class="sd">        Output key in `.obsm`.</span>
+<span class="sd">    return_hvf : bool</span>
+<span class="sd">        Whether to return selected peak indices.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Optional[Tuple[np.ndarray, np.ndarray]]</span>
+<span class="sd">        If return_hvf is True, returns names and indices of selected peaks.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">measured_ads</span> <span class="o">=</span> <span class="p">[</span><span class="n">ad</span> <span class="k">for</span> <span class="n">ad</span> <span class="ow">in</span> <span class="n">epi_ads</span> <span class="k">if</span> <span class="n">ad</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="n">ad_concat</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">measured_ads</span><span class="p">)</span>
+    <span class="n">sc</span><span class="o">.</span><span class="n">pp</span><span class="o">.</span><span class="n">highly_variable_genes</span><span class="p">(</span><span class="n">ad_concat</span><span class="p">,</span> <span class="n">flavor</span><span class="o">=</span><span class="s1">&#39;seurat_v3&#39;</span><span class="p">,</span> <span class="n">n_top_genes</span><span class="o">=</span><span class="n">n_peak</span><span class="p">,</span> <span class="n">batch_key</span><span class="o">=</span><span class="n">batch_key</span><span class="p">)</span>
+
+    <span class="n">transformer</span> <span class="o">=</span> <span class="n">lsiTransformer</span><span class="p">(</span>
+        <span class="n">n_components</span><span class="o">=</span><span class="n">n_comps</span><span class="p">,</span> <span class="n">drop_first</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+        <span class="n">z_score</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">tfidf</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">svd</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">pcaAlgo</span><span class="o">=</span><span class="s1">&#39;arpack&#39;</span>
+    <span class="p">)</span>
+    <span class="n">ad_concat</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="s1">&#39;X_lsi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">transformer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ad_concat</span><span class="p">[:,</span> <span class="n">ad_concat</span><span class="o">.</span><span class="n">var</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;highly_variable&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()])</span><span class="o">.</span><span class="n">values</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">measured_ads</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">batch_corr</span><span class="p">:</span>
+        <span class="n">ad_concat</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">harmony</span><span class="p">(</span><span class="n">ad_concat</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="s1">&#39;X_lsi&#39;</span><span class="p">],</span> <span class="n">ad_concat</span><span class="o">.</span><span class="n">obs</span><span class="p">[</span><span class="n">batch_key</span><span class="p">]</span><span class="o">.</span><span class="n">to_list</span><span class="p">(),</span> <span class="n">use_gpu</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ad_concat</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">ad_concat</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="s1">&#39;X_lsi&#39;</span><span class="p">]</span>
+    
+    <span class="n">split_adata_ob</span><span class="p">([</span><span class="n">ad</span> <span class="k">for</span> <span class="n">ad</span> <span class="ow">in</span> <span class="n">epi_ads</span> <span class="k">if</span> <span class="n">ad</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">],</span> <span class="n">ad_concat</span><span class="p">,</span> <span class="n">ob</span><span class="o">=</span><span class="s1">&#39;obsm&#39;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">return_hvf</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ad_concat</span><span class="o">.</span><span class="n">var</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;highly_variable&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">(),</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">ad_concat</span><span class="o">.</span><span class="n">var</span><span class="p">[</span><span class="s1">&#39;highly_variable&#39;</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

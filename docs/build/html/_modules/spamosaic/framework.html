@@ -1,0 +1,645 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>spamosaic.framework &mdash; spamosaic v1.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=9af0dbfa" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=393fe109"></script>
+      <script src="../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            spamosaic
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../spamosaic.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dataset.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../credits.html">Credits</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">spamosaic</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">spamosaic.framework</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for spamosaic.framework</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">gc</span>
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Iterable</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span><span class="p">,</span> <span class="n">PurePath</span>
+<span class="kn">import</span> <span class="nn">scipy</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.patches</span> <span class="k">as</span> <span class="nn">mpatches</span>
+<span class="kn">import</span> <span class="nn">scanpy</span> <span class="k">as</span> <span class="nn">sc</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sps</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">join</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">rcParams</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
+<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">adjusted_rand_score</span>
+<span class="kn">from</span> <span class="nn">scipy.sparse.csgraph</span> <span class="kn">import</span> <span class="n">connected_components</span>
+<span class="kn">from</span> <span class="nn">torch_geometric.data</span> <span class="kn">import</span> <span class="n">HeteroData</span><span class="p">,</span> <span class="n">Data</span>
+<span class="kn">from</span> <span class="nn">torch_geometric.nn</span> <span class="kn">import</span> <span class="n">GAE</span>
+<span class="kn">from</span> <span class="nn">torch_geometric.utils</span> <span class="kn">import</span> <span class="n">train_test_split_edges</span><span class="p">,</span> <span class="n">negative_sampling</span>
+
+<span class="kn">from</span> <span class="nn">spamosaic.train_utils</span> <span class="kn">import</span> <span class="n">set_seeds</span><span class="p">,</span> <span class="n">train_model</span>
+<span class="kn">import</span> <span class="nn">spamosaic.utils</span> <span class="k">as</span> <span class="nn">utls</span>
+<span class="kn">import</span> <span class="nn">spamosaic.build_graph</span> <span class="k">as</span> <span class="nn">build_graph</span>
+<span class="kn">import</span> <span class="nn">spamosaic.architectures</span> <span class="k">as</span> <span class="nn">archs</span>
+<span class="kn">from</span> <span class="nn">spamosaic.loss</span> <span class="kn">import</span> <span class="n">CL_loss</span>
+
+<span class="n">cur_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+
+<div class="viewcode-block" id="SpaMosaic"><a class="viewcode-back" href="../../api/spamosaic.framework.SpaMosaic.html#spamosaic.framework.SpaMosaic">[docs]</a><span class="k">class</span> <span class="nc">SpaMosaic</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    SpaMosaic: A modular framework for multi-modal spatial omics integration.</span>
+
+<span class="sd">    This class manages data pre-processing, intra- and inter-batch graph construction, </span>
+<span class="sd">    model initialization and training, feature alignment, and imputation across multiple</span>
+<span class="sd">    omics modalities (e.g., RNA, ADT, ATAC) in spatial transcriptomics.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    modBatch_dict : dict</span>
+<span class="sd">        Dictionary mapping modality name (e.g., &#39;rna&#39;, &#39;adt&#39;) to a list of AnnData objects (batches).</span>
+<span class="sd">    input_key : str</span>
+<span class="sd">        Key in `obsm` where input features are stored (e.g., &#39;dimred_bc&#39;).</span>
+<span class="sd">    mnn_rep_key : str, optional</span>
+<span class="sd">        Key for representation used in MNN search. If None, defaults to `input_key`.</span>
+<span class="sd">    batch_key : str</span>
+<span class="sd">        Column name in `obs` denoting batch identity.</span>
+<span class="sd">    radius_cutoff : int</span>
+<span class="sd">        Radius threshold to construct spatial neighbor graph.</span>
+<span class="sd">    intra_knns : int or list of int</span>
+<span class="sd">        Number of neighbors in intra-batch graph (can be int or per-batch list).</span>
+<span class="sd">    inter_knn_base : int</span>
+<span class="sd">        Base KNN size for inter-batch MNN search.</span>
+<span class="sd">    smooth_input : bool</span>
+<span class="sd">        Whether to apply GCN-based input feature smoothing.</span>
+<span class="sd">    smooth_L : int</span>
+<span class="sd">        Number of GCN layers used in smoothing.</span>
+<span class="sd">    inter_auto_knn : bool</span>
+<span class="sd">        Whether to adapt KNN size based on batch size ratio.</span>
+<span class="sd">    inter_auto_thr : float</span>
+<span class="sd">        Size ratio threshold to apply adaptive KNN.</span>
+<span class="sd">    rmv_outlier : bool</span>
+<span class="sd">        Whether to remove outlier MNN pairs.</span>
+<span class="sd">    contamination : str or float</span>
+<span class="sd">        Contamination level for outlier detection (used in IsolationForest).</span>
+<span class="sd">    w_g : float</span>
+<span class="sd">        Weight for inter-batch expression edges in the merged graph.</span>
+<span class="sd">    log_dir : str, optional</span>
+<span class="sd">        Directory for saving logs or results.</span>
+<span class="sd">    seed : int</span>
+<span class="sd">        Random seed.</span>
+<span class="sd">    num_workers : int</span>
+<span class="sd">        Number of workers used for computation.</span>
+<span class="sd">    device : str</span>
+<span class="sd">        Device to use, e.g., &#39;cuda:0&#39; or &#39;cpu&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> 
+        <span class="n">modBatch_dict</span><span class="o">=</span><span class="p">{},</span>  <span class="c1"># dict={&#39;rna&#39;:[batch1, None, ...], &#39;adt&#39;:[batch1, batch2, ...], ...}</span>
+        <span class="n">input_key</span><span class="o">=</span><span class="s1">&#39;dimred_bc&#39;</span><span class="p">,</span>
+        <span class="n">mnn_rep_key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">batch_key</span><span class="o">=</span><span class="s1">&#39;batch&#39;</span><span class="p">,</span> 
+        <span class="n">radius_cutoff</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">intra_knns</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">inter_knn_base</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> 
+        <span class="n">smooth_input</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">smooth_L</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">inter_auto_knn</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">inter_auto_thr</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+        <span class="n">rmv_outlier</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">contamination</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span>
+        <span class="n">w_g</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">log_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">seed</span><span class="o">=</span><span class="mi">1234</span><span class="p">,</span> <span class="n">num_workers</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
+        <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cuda:0&#39;</span>
+    <span class="p">):</span>  
+        <span class="k">if</span> <span class="s1">&#39;cuda&#39;</span> <span class="ow">in</span> <span class="n">device</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;CUDA was requested but no CUDA device is available. Falling back to CPU.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="n">device</span><span class="p">)</span> <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;cuda&#39;</span> <span class="ow">in</span> <span class="n">device</span><span class="p">)</span> <span class="ow">and</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s1">&#39;cpu&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_dir</span> <span class="o">=</span> <span class="n">log_dir</span>
+        <span class="k">if</span> <span class="n">log_dir</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">log_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">set_seeds</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">radius_cutoff</span> <span class="o">=</span> <span class="n">radius_cutoff</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">w_g</span> <span class="o">=</span> <span class="n">w_g</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_workers</span> <span class="o">=</span> <span class="n">num_workers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rmv_outlier</span> <span class="o">=</span> <span class="n">rmv_outlier</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contamination</span> <span class="o">=</span> <span class="n">contamination</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">smooth_input</span> <span class="o">=</span> <span class="n">smooth_input</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">smooth_L</span> <span class="o">=</span> <span class="n">smooth_L</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_key</span> <span class="o">=</span> <span class="n">input_key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mnn_rep_key</span> <span class="o">=</span> <span class="n">input_key</span> <span class="k">if</span> <span class="n">mnn_rep_key</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">mnn_rep_key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mod_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">modBatch_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_mods</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mod_list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_batches</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">modBatch_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mod_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_key</span> <span class="o">=</span> <span class="n">batch_key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">barc2batch</span> <span class="o">=</span> <span class="n">utls</span><span class="o">.</span><span class="n">get_barc2batch</span><span class="p">(</span><span class="n">modBatch_dict</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">intra_knns</span> <span class="o">=</span> <span class="n">intra_knns</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">intra_knns</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">intra_knns</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">n_batches</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inter_knn_base</span> <span class="o">=</span> <span class="n">inter_knn_base</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inter_auto_knn</span> <span class="o">=</span> <span class="n">inter_auto_knn</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inter_auto_thr</span> <span class="o">=</span> <span class="n">inter_auto_thr</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_expr_adj</span> <span class="o">=</span> <span class="p">(</span><span class="n">w_g</span><span class="o">!=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># check if there is empty batch</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_contained_mod_ids</span> <span class="o">=</span> <span class="n">utls</span><span class="o">.</span><span class="n">check_batch_empty</span><span class="p">(</span><span class="n">modBatch_dict</span><span class="p">)</span>
+
+        <span class="c1"># check if this dataset can be integrated</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_integrity</span><span class="p">()</span>
+
+        <span class="c1"># prepare spot-spot for each modality</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prepare_intra_graphs</span><span class="p">(</span><span class="n">modBatch_dict</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">smooth_input</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">apply_smoothing</span><span class="p">(</span><span class="n">modBatch_dict</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">prepare_inter_graphs</span><span class="p">(</span><span class="n">modBatch_dict</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prepare_inputs</span><span class="p">(</span><span class="n">modBatch_dict</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SpaMosaic.check_integrity"><a class="viewcode-back" href="../../api/spamosaic.framework.html#spamosaic.framework.SpaMosaic.check_integrity">[docs]</a>    <span class="k">def</span> <span class="nf">check_integrity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if all modalities across batches form a connected integration graph.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        RuntimeError</span>
+<span class="sd">            If the graph of shared modalities across batches is not fully connected.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mod_graph</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">n_mods</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_mods</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">bi</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_batches</span><span class="p">):</span>
+            <span class="n">modIds_in_bi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_contained_mod_ids</span><span class="p">[</span><span class="n">bi</span><span class="p">]</span>
+            <span class="n">mod_pairs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="n">modIds_in_bi</span><span class="p">,</span> <span class="n">modIds_in_bi</span><span class="p">)))</span>
+            <span class="n">mod_graph</span><span class="p">[</span><span class="n">mod_pairs</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">mod_pairs</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">n_cs</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">connected_components</span><span class="p">(</span><span class="n">mod_graph</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">return_labels</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n_cs</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">ci</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">labels</span><span class="p">):</span>
+                <span class="n">ni_msk</span> <span class="o">=</span> <span class="n">labels</span> <span class="o">==</span> <span class="n">ci</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;conn </span><span class="si">{</span><span class="n">ci</span><span class="si">}</span><span class="s1">:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mod_list</span><span class="p">[</span><span class="n">ni_msk</span><span class="p">])</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Dataset not connected, cannot be integrated&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SpaMosaic.prepare_intra_graphs"><a class="viewcode-back" href="../../api/spamosaic.framework.html#spamosaic.framework.SpaMosaic.prepare_intra_graphs">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_intra_graphs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modBatch_dict</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Build spatial neighbor graphs for each modality across batches.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        modBatch_dict : dict</span>
+<span class="sd">            Dictionary mapping modality to list of AnnData objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># spatial-neighbor graph</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mod_list</span><span class="p">:</span>
+            <span class="c1"># ads = [ad for ad in modBatch_dict[key] if ad is not None]</span>
+            <span class="n">build_graph</span><span class="o">.</span><span class="n">build_intra_graph</span><span class="p">(</span><span class="n">modBatch_dict</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">rad_cutoff</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">radius_cutoff</span><span class="p">,</span> <span class="n">knns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">intra_knns</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SpaMosaic.apply_smoothing"><a class="viewcode-back" href="../../api/spamosaic.framework.html#spamosaic.framework.SpaMosaic.apply_smoothing">[docs]</a>    <span class="k">def</span> <span class="nf">apply_smoothing</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modBatch_dict</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Apply feature smoothing using LGCN on intra-batch graphs.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        modBatch_dict : dict</span>
+<span class="sd">            Dictionary mapping modality to list of AnnData objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mod_list</span><span class="p">:</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">archs</span><span class="o">.</span><span class="n">wlgcn</span><span class="o">.</span><span class="n">WLGCN_vanilla</span><span class="p">(</span><span class="n">K</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">smooth_L</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">ad</span> <span class="ow">in</span> <span class="n">modBatch_dict</span><span class="p">[</span><span class="n">mod</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">ad</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="n">attr</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">ad</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">input_key</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+                <span class="n">adj</span> <span class="o">=</span> <span class="n">ad</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;adj&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tocoo</span><span class="p">()</span>
+                <span class="n">edge_index</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">adj</span><span class="o">.</span><span class="n">row</span><span class="p">,</span> <span class="n">adj</span><span class="o">.</span><span class="n">col</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+                <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+                    <span class="n">smth_attr</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">attr</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">)</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+                    <span class="n">ad</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">input_key</span><span class="o">+</span><span class="s1">&#39;_smth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">smth_attr</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mnn_rep_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_key</span> <span class="o">+</span> <span class="s1">&#39;_smth&#39;</span></div>
+
+    
+<div class="viewcode-block" id="SpaMosaic.prepare_inter_graphs"><a class="viewcode-back" href="../../api/spamosaic.framework.html#spamosaic.framework.SpaMosaic.prepare_inter_graphs">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_inter_graphs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modBatch_dict</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Build mutual nearest neighbor (MNN) graphs between batches for each modality.</span>
+<span class="sd">        </span>
+<span class="sd">        This includes:</span>
+<span class="sd">        - Identifying bridge and non-bridge batches.</span>
+<span class="sd">        - Computing MNN pairs within each modality.</span>
+<span class="sd">        - Optionally filtering outliers.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># determine which batches as bridges, which not. </span>
+        <span class="n">mod_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">n_mods</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_batches</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">bi</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_batches</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">ki</span><span class="p">,</span><span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mod_list</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">modBatch_dict</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">bi</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">mod_mask</span><span class="p">[</span><span class="n">ki</span><span class="p">][</span><span class="n">bi</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">bridge_batch_num_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mod_mask</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># e.g., [idx, idx2, ]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">non_bridge_batch_num_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mod_mask</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1">### prepare meta parameter for training</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mod_batch_split</span> <span class="o">=</span> <span class="p">{</span>   <span class="c1"># {&#39;rna&#39;:[n_obs, 0, ...]}</span>
+            <span class="n">key</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">modBatch_dict</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">bi</span><span class="p">]</span><span class="o">.</span><span class="n">n_obs</span> 
+                <span class="k">if</span> <span class="n">modBatch_dict</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">bi</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> 
+                <span class="k">else</span> <span class="mi">0</span> 
+                <span class="k">for</span> <span class="n">bi</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_batches</span><span class="p">)</span>
+            <span class="p">]</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mod_list</span>
+        <span class="p">}</span>
+
+        <span class="c1"># mapping batch id to their modality set</span>
+        <span class="c1"># e.g., 1 -&gt; [&#39;rna&#39;, &#39;adt&#39;], 2 -&gt; [&#39;atac&#39;]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bridge_batch_num_ids2mod</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">bi</span><span class="p">:</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mod_list</span> <span class="k">if</span> <span class="n">modBatch_dict</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">bi</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">bi</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bridge_batch_num_ids</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">non_bridge_batch_num_ids2mod</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">bi</span><span class="p">:</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mod_list</span> <span class="k">if</span> <span class="n">modBatch_dict</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">bi</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">bi</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">non_bridge_batch_num_ids</span>
+        <span class="p">}</span>
+
+        <span class="n">bridge_ads</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">key</span><span class="p">:</span> <span class="p">[</span><span class="n">modBatch_dict</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">aid</span><span class="p">]</span> <span class="k">for</span> <span class="n">aid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bridge_batch_num_ids</span> <span class="k">if</span> <span class="n">modBatch_dict</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">aid</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mod_list</span>
+        <span class="p">}</span>
+        <span class="n">test_ads</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">key</span><span class="p">:</span> <span class="p">[</span><span class="n">modBatch_dict</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">aid</span><span class="p">]</span> <span class="k">for</span> <span class="n">aid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">non_bridge_batch_num_ids</span> <span class="k">if</span> <span class="n">modBatch_dict</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">aid</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mod_list</span>
+        <span class="p">}</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_expr_adj</span><span class="p">:</span>
+            <span class="n">mod_mnn_set</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mod_list</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Searching MNN within </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">mod_mnn_set</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">build_graph</span><span class="o">.</span><span class="n">build_mnn_graph</span><span class="p">(</span>
+                    <span class="n">bridge_ads</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">test_ads</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">mnn_rep_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_key</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">inter_knn_base</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">inter_auto_knn</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">inter_auto_thr</span><span class="p">,</span> 
+                    <span class="bp">self</span><span class="o">.</span><span class="n">rmv_outlier</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contamination</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">seed</span>
+                <span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Number of mnn pairs for </span><span class="si">{}</span><span class="s1">:</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">mod_mnn_set</span><span class="p">[</span><span class="n">key</span><span class="p">])))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mod_mnn_set</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">key</span><span class="p">:</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mod_list</span>
+            <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mod_mnn_set</span> <span class="o">=</span> <span class="n">mod_mnn_set</span></div>
+        
+<div class="viewcode-block" id="SpaMosaic.prepare_inputs"><a class="viewcode-back" href="../../api/spamosaic.framework.html#spamosaic.framework.SpaMosaic.prepare_inputs">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modBatch_dict</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Merge AnnData objects and construct final PyTorch graph inputs.</span>
+
+<span class="sd">        Includes:</span>
+<span class="sd">        - Concatenating features and adjacency matrices.</span>
+<span class="sd">        - Adding intra- and inter-batch edges.</span>
+<span class="sd">        - Computing edge types (same-batch or cross-batch).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mod_graphs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">mod_graphs</span><span class="p">[</span><span class="s1">&#39;edge&#39;</span><span class="p">],</span> <span class="n">mod_graphs</span><span class="p">[</span><span class="s1">&#39;edgeW&#39;</span><span class="p">],</span> <span class="n">mod_graphs</span><span class="p">[</span><span class="s1">&#39;edgeC&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{},</span> <span class="p">{}</span>
+        <span class="n">mod_graphs</span><span class="p">[</span><span class="s1">&#39;attribute&#39;</span><span class="p">],</span> <span class="n">mod_graphs</span><span class="p">[</span><span class="s1">&#39;attribute_dim&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{}</span>
+        <span class="n">inp_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_key</span><span class="o">+</span><span class="s1">&#39;_smth&#39;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">smooth_input</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_key</span> 
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mod_input_ads</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mod_graph_idx2barc</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mod_list</span><span class="p">:</span>
+            <span class="n">ads</span> <span class="o">=</span> <span class="p">[</span><span class="n">ad</span> <span class="k">for</span> <span class="n">ad</span> <span class="ow">in</span> <span class="n">modBatch_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">if</span> <span class="n">ad</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+            <span class="n">mnn_set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mod_mnn_set</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+
+            <span class="c1"># === mergeGraph logic inlined ===</span>
+            <span class="n">concat_obs</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">ad</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">for</span> <span class="n">ad</span> <span class="ow">in</span> <span class="n">ads</span><span class="p">])</span>
+            <span class="n">concat_obsm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">ad</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="n">inp_key</span><span class="p">]</span> <span class="k">for</span> <span class="n">ad</span> <span class="ow">in</span> <span class="n">ads</span><span class="p">])</span>
+            <span class="n">ad_merge</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">AnnData</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">concat_obs</span><span class="p">),</span> <span class="mi">2</span><span class="p">)),</span> <span class="n">obs</span><span class="o">=</span><span class="n">concat_obs</span><span class="p">,</span> <span class="n">obsm</span><span class="o">=</span><span class="p">{</span><span class="n">inp_key</span><span class="p">:</span> <span class="n">concat_obsm</span><span class="p">})</span>
+
+            <span class="c1"># intra graph: block diagonal</span>
+            <span class="n">intra_graph</span> <span class="o">=</span> <span class="n">sps</span><span class="o">.</span><span class="n">block_diag</span><span class="p">([</span><span class="n">ad</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;adj&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">ad</span> <span class="ow">in</span> <span class="n">ads</span><span class="p">])</span><span class="o">.</span><span class="n">tocoo</span><span class="p">()</span>
+
+            <span class="c1"># build inter-graph from mnn_set</span>
+            <span class="n">name2idx</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">ad_merge</span><span class="o">.</span><span class="n">obs_names</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">ad_merge</span><span class="o">.</span><span class="n">n_obs</span><span class="p">)))</span>
+            <span class="n">idx2name</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">name2idx</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+            <span class="c1"># self.mod_graph_idx2barc[k] = idx2name</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">mnn_set</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">mnn_i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">name2idx</span><span class="p">[</span><span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">name2idx</span><span class="p">[</span><span class="n">e</span><span class="p">[</span><span class="mi">1</span><span class="p">]]]</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">mnn_set</span><span class="p">])</span>
+                <span class="n">mnn_symm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">mnn_i</span><span class="p">,</span> <span class="n">mnn_i</span><span class="p">[:,</span> <span class="p">::</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+                <span class="n">inter_graph</span> <span class="o">=</span> <span class="n">sps</span><span class="o">.</span><span class="n">coo_matrix</span><span class="p">(</span>
+                    <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mnn_symm</span><span class="p">)),</span> <span class="p">(</span><span class="n">mnn_symm</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">mnn_symm</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">])),</span>
+                    <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">ad_merge</span><span class="o">.</span><span class="n">n_obs</span><span class="p">,</span> <span class="n">ad_merge</span><span class="o">.</span><span class="n">n_obs</span><span class="p">)</span>
+                <span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">w_g</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">inter_graph</span> <span class="o">=</span> <span class="n">sps</span><span class="o">.</span><span class="n">coo_matrix</span><span class="p">((</span><span class="n">ad_merge</span><span class="o">.</span><span class="n">n_obs</span><span class="p">,</span> <span class="n">ad_merge</span><span class="o">.</span><span class="n">n_obs</span><span class="p">))</span>
+
+            <span class="c1"># ad_merge.uns[&#39;mnn_graph&#39;] = inter_graph</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_expr_adj</span><span class="p">:</span>
+                <span class="n">merged_graph</span> <span class="o">=</span> <span class="p">(</span><span class="n">intra_graph</span> <span class="o">+</span> <span class="n">inter_graph</span><span class="p">)</span><span class="o">.</span><span class="n">tocoo</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">merged_graph</span> <span class="o">=</span> <span class="n">intra_graph</span>
+
+            <span class="c1"># === store merged adata ===</span>
+            <span class="n">ad_merge</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;adj&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">merged_graph</span>
+            <span class="n">ad_merge</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;edgeList&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">merged_graph</span><span class="o">.</span><span class="n">row</span><span class="p">,</span> <span class="n">merged_graph</span><span class="o">.</span><span class="n">col</span><span class="p">)</span>
+            <span class="n">ad_merge</span><span class="o">.</span><span class="n">uns</span><span class="p">[</span><span class="s1">&#39;edgeW&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">merged_graph</span><span class="o">.</span><span class="n">data</span>
+            <span class="c1"># self.mod_input_ads[k] = ad_merge</span>
+
+            <span class="c1"># === convert to PyTorch inputs ===</span>
+            <span class="n">edge_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">merged_graph</span><span class="o">.</span><span class="n">row</span><span class="p">,</span> <span class="n">merged_graph</span><span class="o">.</span><span class="n">col</span><span class="p">])</span>
+            <span class="n">mod_graphs</span><span class="p">[</span><span class="s1">&#39;edge&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">edge_idx</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">mod_graphs</span><span class="p">[</span><span class="s1">&#39;edgeW&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">merged_graph</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">mod_graphs</span><span class="p">[</span><span class="s1">&#39;attribute&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">ad_merge</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="n">inp_key</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+            <span class="n">mod_graphs</span><span class="p">[</span><span class="s1">&#39;attribute_dim&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">ad_merge</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="n">inp_key</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="c1"># === edgeC: intra vs inter (used for smoothing etc.)</span>
+            <span class="n">barc1</span> <span class="o">=</span> <span class="n">utls</span><span class="o">.</span><span class="n">dict_map</span><span class="p">(</span><span class="n">idx2name</span><span class="p">,</span> <span class="n">merged_graph</span><span class="o">.</span><span class="n">row</span><span class="p">)</span>
+            <span class="n">barc2</span> <span class="o">=</span> <span class="n">utls</span><span class="o">.</span><span class="n">dict_map</span><span class="p">(</span><span class="n">idx2name</span><span class="p">,</span> <span class="n">merged_graph</span><span class="o">.</span><span class="n">col</span><span class="p">)</span>
+            <span class="n">b1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">utls</span><span class="o">.</span><span class="n">dict_map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">barc2batch</span><span class="p">,</span> <span class="n">barc1</span><span class="p">))</span>
+            <span class="n">b2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">utls</span><span class="o">.</span><span class="n">dict_map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">barc2batch</span><span class="p">,</span> <span class="n">barc2</span><span class="p">))</span>
+            <span class="n">edgeC</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">b1</span> <span class="o">==</span> <span class="n">b2</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">mod_graphs</span><span class="p">[</span><span class="s1">&#39;edgeC&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">edgeC</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">mod_graphs</span> <span class="o">=</span> <span class="n">mod_graphs</span></div>
+
+<div class="viewcode-block" id="SpaMosaic.prepare_net"><a class="viewcode-back" href="../../api/spamosaic.framework.html#spamosaic.framework.SpaMosaic.prepare_net">[docs]</a>    <span class="k">def</span> <span class="nf">prepare_net</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">net</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Instantiate the architecture for each modality based on config.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        net : str</span>
+<span class="sd">            Name of model architecture (must match a config YAML file).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            Mapping from modality name to initialized PyTorch model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">utls</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cur_dir</span><span class="si">}</span><span class="s1">/configs/</span><span class="si">{</span><span class="n">net</span><span class="si">}</span><span class="s1">.yaml&#39;</span><span class="p">)</span>
+        
+        <span class="n">mod_model</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mod_list</span><span class="p">:</span>
+            <span class="n">encoder</span> <span class="o">=</span> <span class="n">archs</span><span class="o">.</span><span class="n">wlgcn</span><span class="o">.</span><span class="n">WLGCN</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mod_graphs</span><span class="p">[</span><span class="s1">&#39;attribute_dim&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">],</span> <span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">out_dim</span><span class="p">,</span> <span class="n">K</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">n_layer</span><span class="p">,</span> <span class="n">dec_l</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">n_dec_l</span><span class="p">,</span> 
+                                        <span class="n">hidden_size</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">hid_dim</span><span class="p">,</span> <span class="n">dropout</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">dropout</span><span class="p">,</span> <span class="n">slope</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">slope</span><span class="p">)</span>
+            <span class="n">mod_model</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">encoder</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+            
+        <span class="k">return</span> <span class="n">mod_model</span></div>
+
+<div class="viewcode-block" id="SpaMosaic.train"><a class="viewcode-back" href="../../api/spamosaic.framework.html#spamosaic.framework.SpaMosaic.train">[docs]</a>    <span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">net</span><span class="p">,</span> <span class="n">lr</span><span class="p">,</span> <span class="n">use_mini_thr</span><span class="o">=</span><span class="mi">8000</span><span class="p">,</span> <span class="n">mini_batch_size</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span> <span class="n">loss_type</span><span class="o">=</span><span class="s1">&#39;adapted&#39;</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_epochs</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">w_rec_g</span><span class="o">=</span><span class="mf">0.</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Train the SpaMosaic model using contrastive and reconstruction losses.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        net : str</span>
+<span class="sd">            Architecture name.</span>
+<span class="sd">        lr : float</span>
+<span class="sd">            Learning rate.</span>
+<span class="sd">        use_mini_thr : int</span>
+<span class="sd">            Threshold above which mini-batch training is used.</span>
+<span class="sd">        mini_batch_size : int</span>
+<span class="sd">            Size of mini-batches if needed.</span>
+<span class="sd">        loss_type : str</span>
+<span class="sd">            Type of loss (&#39;adapted&#39; or &#39;ce&#39;).</span>
+<span class="sd">        T : float</span>
+<span class="sd">            Temperature for contrastive loss.</span>
+<span class="sd">        bias : float</span>
+<span class="sd">            Bias term in adapted contrastive loss.</span>
+<span class="sd">        n_epochs : int</span>
+<span class="sd">            Number of training epochs.</span>
+<span class="sd">        w_rec_g : float</span>
+<span class="sd">            Weight for reconstruction loss.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># set model architectures</span>
+        <span class="n">mod_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare_net</span><span class="p">(</span><span class="n">net</span><span class="p">)</span>
+
+        <span class="c1"># set optimizer</span>
+        <span class="n">mod_optims</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">mod_model</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">lr</span><span class="p">,</span> <span class="n">weight_decay</span><span class="o">=</span><span class="mf">5e-4</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mod_list</span><span class="p">}</span>
+
+        <span class="c1"># for each batch, the meaning of parameter:</span>
+        <span class="c1"># bridge_batch_meta_numbers = [{if as bridge}, {number of spots}, {size of mini-batches}, {number of measured modalites}, {measured modalities}]</span>
+        <span class="c1"># test_batch_meta_numbers   = [{if as bridge}, {measured modalities}]</span>
+        <span class="n">batch_train_meta_numbers</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">bi</span><span class="p">,</span> <span class="n">ms</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bridge_batch_num_ids2mod</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">n_cell</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mod_batch_split</span><span class="p">[</span><span class="n">ms</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">bi</span><span class="p">]</span>
+            <span class="n">n_loss_batch</span> <span class="o">=</span> <span class="n">n_cell</span> <span class="k">if</span> <span class="n">n_cell</span> <span class="o">&lt;=</span> <span class="n">use_mini_thr</span> <span class="k">else</span> <span class="n">mini_batch_size</span>  <span class="c1"># determine mini-batch size for each batch</span>
+            <span class="n">n_batch</span> <span class="o">=</span> <span class="n">n_cell</span> <span class="o">//</span> <span class="n">n_loss_batch</span>                                      <span class="c1"># size of mini-batches</span>
+            <span class="n">batch_train_meta_numbers</span><span class="p">[</span><span class="n">bi</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">n_cell</span><span class="p">,</span> <span class="n">n_loss_batch</span><span class="p">,</span> <span class="n">n_batch</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">ms</span><span class="p">),</span> <span class="n">ms</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">bi</span><span class="p">,</span> <span class="n">ms</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">non_bridge_batch_num_ids2mod</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">batch_train_meta_numbers</span><span class="p">[</span><span class="n">bi</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="n">ms</span><span class="p">)</span>
+        <span class="c1"># print(batch_train_meta_numbers)</span>
+
+        <span class="c1"># detetermine contrastive learning loss </span>
+        <span class="k">if</span> <span class="n">loss_type</span><span class="o">==</span><span class="s1">&#39;adapted&#39;</span><span class="p">:</span>  <span class="c1"># use our proposed contrastive learning loss, which can handle alignment of three or more modalities</span>
+            <span class="n">crit1</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">bi</span><span class="p">:</span><span class="n">CL_loss</span><span class="p">(</span><span class="n">batch_train_meta_numbers</span><span class="p">[</span><span class="n">bi</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span> <span class="n">rep</span><span class="o">=</span><span class="n">batch_train_meta_numbers</span><span class="p">[</span><span class="n">bi</span><span class="p">][</span><span class="mi">4</span><span class="p">],</span> <span class="n">bias</span><span class="o">=</span><span class="n">bias</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">bi</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bridge_batch_num_ids</span>
+            <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>  
+            <span class="n">crit1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>  <span class="c1"># canonical implementation for CL loss, can only handle 2-modal alignment</span>
+
+        <span class="c1"># feature reconstruction loss</span>
+        <span class="n">crit2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MSELoss</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>  
+
+        <span class="c1"># mod_input_feat, mod_graphs_edge, mod_graphs_edge_w</span>
+        <span class="n">mod_model</span><span class="p">,</span> <span class="n">loss_cl</span><span class="p">,</span> <span class="n">loss_rec</span> <span class="o">=</span> <span class="n">train_model</span><span class="p">(</span>
+            <span class="n">mod_model</span><span class="p">,</span> <span class="n">mod_optims</span><span class="p">,</span> <span class="n">crit1</span><span class="p">,</span> <span class="n">crit2</span><span class="p">,</span> <span class="n">loss_type</span><span class="p">,</span> <span class="n">w_rec_g</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mod_graphs</span><span class="p">[</span><span class="s1">&#39;attribute&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">mod_graphs</span><span class="p">[</span><span class="s1">&#39;edge&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">mod_graphs</span><span class="p">[</span><span class="s1">&#39;edgeW&#39;</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">mod_graphs</span><span class="p">[</span><span class="s1">&#39;edgeC&#39;</span><span class="p">],</span>
+            <span class="n">batch_train_meta_numbers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mod_batch_split</span><span class="p">,</span>
+            <span class="n">T</span><span class="p">,</span> <span class="n">n_epochs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mod_model</span> <span class="o">=</span> <span class="n">mod_model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss_cl</span>  <span class="o">=</span> <span class="n">loss_cl</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss_rec</span> <span class="o">=</span> <span class="n">loss_rec</span></div>
+
+<div class="viewcode-block" id="SpaMosaic.infer_emb"><a class="viewcode-back" href="../../api/spamosaic.framework.html#spamosaic.framework.SpaMosaic.infer_emb">[docs]</a>    <span class="k">def</span> <span class="nf">infer_emb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modBatch_dict</span><span class="p">,</span> <span class="n">emb_key</span><span class="o">=</span><span class="s1">&#39;emb&#39;</span><span class="p">,</span> <span class="n">final_latent_key</span><span class="o">=</span><span class="s1">&#39;merged_emb&#39;</span><span class="p">,</span> <span class="n">cat</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span> 
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Infer latent embeddings for each cell and return merged AnnData list.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        modBatch_dict : dict</span>
+<span class="sd">            Original input dictionary of modalities and batches.</span>
+<span class="sd">        emb_key : str</span>
+<span class="sd">            Key to store intermediate embeddings.</span>
+<span class="sd">        final_latent_key : str</span>
+<span class="sd">            Key to store final merged embedding in returned AnnData.</span>
+<span class="sd">        cat : bool</span>
+<span class="sd">            Whether to concatenate (True) or average (False) modalities.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of AnnData</span>
+<span class="sd">            Reconstructed AnnData objects with merged embeddings.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mod_list</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mod_model</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+            <span class="n">z</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mod_model</span><span class="p">[</span><span class="n">k</span><span class="p">](</span><span class="bp">self</span><span class="o">.</span><span class="n">mod_graphs</span><span class="p">[</span><span class="s1">&#39;attribute&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">mod_graphs</span><span class="p">[</span><span class="s1">&#39;edge&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">mod_graphs</span><span class="p">[</span><span class="s1">&#39;edgeW&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">])</span>
+            <span class="n">z_split</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mod_batch_split</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">bi</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_batches</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">modBatch_dict</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">bi</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">modBatch_dict</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">bi</span><span class="p">]</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="n">emb_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">z_split</span><span class="p">[</span><span class="n">bi</span><span class="p">]</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+
+        <span class="c1"># merge embs from measured modality</span>
+        <span class="n">ad_finals</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">bi</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_batches</span><span class="p">):</span>
+            <span class="n">embs</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mod_list</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">modBatch_dict</span><span class="p">[</span><span class="n">m</span><span class="p">][</span><span class="n">bi</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">embs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">modBatch_dict</span><span class="p">[</span><span class="n">m</span><span class="p">][</span><span class="n">bi</span><span class="p">]</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="n">emb_key</span><span class="p">])</span>
+                    <span class="n">ad_tmp</span> <span class="o">=</span> <span class="n">modBatch_dict</span><span class="p">[</span><span class="n">m</span><span class="p">][</span><span class="n">bi</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">cat</span><span class="p">:</span>
+                <span class="n">emb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">embs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">emb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">embs</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">ad</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">AnnData</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">emb</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">2</span><span class="p">)),</span> <span class="n">obs</span><span class="o">=</span><span class="n">ad_tmp</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span> <span class="n">obsm</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;spatial&#39;</span><span class="p">:</span><span class="n">ad_tmp</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="s1">&#39;spatial&#39;</span><span class="p">]})</span>
+            <span class="n">ad</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="n">final_latent_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">emb</span>
+            <span class="n">ad_finals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ad</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ad_finals</span></div>
+
+<div class="viewcode-block" id="SpaMosaic.impute"><a class="viewcode-back" href="../../api/spamosaic.framework.html#spamosaic.framework.SpaMosaic.impute">[docs]</a>    <span class="k">def</span> <span class="nf">impute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">modBatch_dict</span><span class="p">,</span> <span class="n">emb_key</span><span class="o">=</span><span class="s1">&#39;emb&#39;</span><span class="p">,</span> <span class="n">layer_key</span><span class="o">=</span><span class="s1">&#39;counts&#39;</span><span class="p">,</span> <span class="n">imp_knn</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Impute missing modalities using aligned embedding space and KNN.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        modBatch_dict : dict</span>
+<span class="sd">            Input dictionary of modalities and batches.</span>
+<span class="sd">        emb_key : str</span>
+<span class="sd">            Key where latent embeddings are stored.</span>
+<span class="sd">        layer_key : str</span>
+<span class="sd">            Which layer to impute (e.g., &#39;counts&#39;).</span>
+<span class="sd">        imp_knn : int</span>
+<span class="sd">            Number of neighbors to use in KNN-based imputation.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">        Imputed data dictionary: {modality -&gt; list of arrays (or None)}.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+        <span class="n">aligned_pool</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">k</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">ad</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="n">emb_key</span><span class="p">]</span> <span class="k">for</span> <span class="n">ad</span> <span class="ow">in</span> <span class="n">modBatch_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">if</span> <span class="n">ad</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">modBatch_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="p">}</span>
+
+        <span class="n">target_pool</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">k</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">([</span><span class="n">ad</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="n">layer_key</span><span class="p">]</span><span class="o">.</span><span class="n">A</span> <span class="k">if</span> <span class="n">sps</span><span class="o">.</span><span class="n">issparse</span><span class="p">(</span><span class="n">ad</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="n">layer_key</span><span class="p">])</span> <span class="k">else</span> <span class="n">ad</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="n">layer_key</span><span class="p">]</span>
+                        <span class="k">for</span> <span class="n">ad</span> <span class="ow">in</span> <span class="n">modBatch_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">if</span> <span class="n">ad</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">modBatch_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="p">}</span>
+        
+        <span class="n">imputed_batchDict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">k</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">n_batches</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">modBatch_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">bi</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_batches</span><span class="p">):</span>
+            <span class="n">bi_measued_mod_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">_</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">modBatch_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">modBatch_dict</span><span class="p">[</span><span class="n">_</span><span class="p">][</span><span class="n">bi</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+            <span class="n">bi_missing_mod_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">modBatch_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">bi_measued_mod_names</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">k_q</span> <span class="ow">in</span> <span class="n">bi_missing_mod_names</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;impute </span><span class="si">{</span><span class="n">k_q</span><span class="si">}</span><span class="s1">-</span><span class="si">{</span><span class="n">layer_key</span><span class="si">}</span><span class="s1"> for batch-</span><span class="si">{</span><span class="n">bi</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="c1"># visit all measured mods to impute missing k </span>
+                <span class="n">imps</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">k_v</span> <span class="ow">in</span> <span class="n">bi_measued_mod_names</span><span class="p">:</span>
+                    <span class="n">knn_ind</span> <span class="o">=</span> <span class="n">utls</span><span class="o">.</span><span class="n">nn_approx</span><span class="p">(</span><span class="n">modBatch_dict</span><span class="p">[</span><span class="n">k_v</span><span class="p">][</span><span class="n">bi</span><span class="p">]</span><span class="o">.</span><span class="n">obsm</span><span class="p">[</span><span class="n">emb_key</span><span class="p">],</span> <span class="n">aligned_pool</span><span class="p">[</span><span class="n">k_q</span><span class="p">],</span> <span class="n">knn</span><span class="o">=</span><span class="n">imp_knn</span><span class="p">)</span>
+                    <span class="n">p_q</span> <span class="o">=</span> <span class="n">target_pool</span><span class="p">[</span><span class="n">k_q</span><span class="p">][</span><span class="n">knn_ind</span><span class="o">.</span><span class="n">ravel</span><span class="p">()]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">knn_ind</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> <span class="n">target_pool</span><span class="p">[</span><span class="n">k_q</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">imps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">p_q</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+                <span class="n">imp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">imps</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">imputed_batchDict</span><span class="p">[</span><span class="n">k_q</span><span class="p">][</span><span class="n">bi</span><span class="p">]</span> <span class="o">=</span> <span class="n">imp</span>
+
+        <span class="k">return</span> <span class="n">imputed_batchDict</span></div></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

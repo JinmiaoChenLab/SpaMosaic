@@ -1,0 +1,284 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>spamosaic.build_graph &mdash; spamosaic v1.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=9af0dbfa" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=393fe109"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="spamosaic.build_graph.Cal_Spatial_Net" href="spamosaic.build_graph.Cal_Spatial_Net.html" />
+    <link rel="prev" title="API Documentation" href="../spamosaic.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            spamosaic
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../spamosaic.html">API Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">spamosaic.build_graph</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#spamosaic.build_graph.Cal_Spatial_Net"><code class="docutils literal notranslate"><span class="pre">Cal_Spatial_Net()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spamosaic.build_graph.build_intra_graph"><code class="docutils literal notranslate"><span class="pre">build_intra_graph()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spamosaic.build_graph.build_mnn_graph"><code class="docutils literal notranslate"><span class="pre">build_mnn_graph()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spamosaic.build_graph.determine_kSize"><code class="docutils literal notranslate"><span class="pre">determine_kSize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spamosaic.build_graph.remove_outlier"><code class="docutils literal notranslate"><span class="pre">remove_outlier()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="spamosaic.build_graph.Cal_Spatial_Net.html">spamosaic.build_graph.Cal_Spatial_Net</a></li>
+<li class="toctree-l3"><a class="reference internal" href="spamosaic.build_graph.build_intra_graph.html">spamosaic.build_graph.build_intra_graph</a></li>
+<li class="toctree-l3"><a class="reference internal" href="spamosaic.build_graph.build_mnn_graph.html">spamosaic.build_graph.build_mnn_graph</a></li>
+<li class="toctree-l3"><a class="reference internal" href="spamosaic.build_graph.determine_kSize.html">spamosaic.build_graph.determine_kSize</a></li>
+<li class="toctree-l3"><a class="reference internal" href="spamosaic.build_graph.remove_outlier.html">spamosaic.build_graph.remove_outlier</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="spamosaic.framework.html">spamosaic.framework</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spamosaic.loss.html">spamosaic.loss</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spamosaic.MNN.html">spamosaic.MNN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spamosaic.preprocessing.html">spamosaic.preprocessing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spamosaic.train_utils.html">spamosaic.train_utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spamosaic.utils.html">spamosaic.utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spamosaic.architectures.html">spamosaic.architectures</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../dataset.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../credits.html">Credits</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">spamosaic</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../spamosaic.html">API Documentation</a></li>
+      <li class="breadcrumb-item active">spamosaic.build_graph</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/spamosaic.build_graph.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-spamosaic.build_graph">
+<span id="spamosaic-build-graph"></span><h1>spamosaic.build_graph<a class="headerlink" href="#module-spamosaic.build_graph" title="Permalink to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="spamosaic.build_graph.Cal_Spatial_Net">
+<span class="sig-prename descclassname"><span class="pre">spamosaic.build_graph.</span></span><span class="sig-name descname"><span class="pre">Cal_Spatial_Net</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rad_cutoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k_cutoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_neigh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Radius'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spamosaic/build_graph.html#Cal_Spatial_Net"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spamosaic.build_graph.Cal_Spatial_Net" title="Permalink to this definition"></a></dt>
+<dd><p>Construct spatial graph from spatial coordinates using radius or kNN method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adata</strong> (<em>AnnData</em>) – Input annotated data.</p></li>
+<li><p><strong>rad_cutoff</strong> (<em>float</em><em>, </em><em>optional</em>) – Distance cutoff for radius-based graph.</p></li>
+<li><p><strong>k_cutoff</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of neighbors for kNN-based graph.</p></li>
+<li><p><strong>max_neigh</strong> (<em>int</em>) – Maximum number of neighbors to consider.</p></li>
+<li><p><strong>model</strong> (<em>str</em>) – Type of graph construction: ‘Radius’ or ‘KNN’.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – Whether to print debug info.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>On success, adds the adjacency matrix to <code class="docutils literal notranslate"><span class="pre">adata.uns['adj']</span></code> (SciPy sparse matrix).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spamosaic.build_graph.build_intra_graph">
+<span class="sig-prename descclassname"><span class="pre">spamosaic.build_graph.</span></span><span class="sig-name descname"><span class="pre">build_intra_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ads</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rad_cutoff</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">knns</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spamosaic/build_graph.html#build_intra_graph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spamosaic.build_graph.build_intra_graph" title="Permalink to this definition"></a></dt>
+<dd><p>Construct intra-batch graphs for a list of AnnData objects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ads</strong> (<em>List</em><em>[</em><em>AnnData</em><em>]</em>) – List of spatial AnnData objects.</p></li>
+<li><p><strong>rad_cutoff</strong> (<em>float</em>) – Radius cutoff for spatial neighbor graph.</p></li>
+<li><p><strong>knns</strong> (<em>List</em><em>[</em><em>int</em><em>]</em>) – List of maximum neighbors per AnnData.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spamosaic.build_graph.build_mnn_graph">
+<span class="sig-prename descclassname"><span class="pre">spamosaic.build_graph.</span></span><span class="sig-name descname"><span class="pre">build_mnn_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bridge_ads</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_ads</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_rep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">knn_base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_knn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_thr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rmv_outlier</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contamination</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1234</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spamosaic/build_graph.html#build_mnn_graph"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spamosaic.build_graph.build_mnn_graph" title="Permalink to this definition"></a></dt>
+<dd><p>Build a mutual nearest neighbor (MNN) graph within a single modality.</p>
+<p>This function constructs a set of matched cell pairs across batches (MNNs),
+including both bridge-to-bridge and bridge-to-single relationships, based on
+specified embeddings. Optionally supports automatic KNN sizing and outlier removal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bridge_ads</strong> (<em>list</em><em> of </em><em>AnnData</em>) – List of AnnData objects from bridge batches (i.e., batches with multiple modalities).</p></li>
+<li><p><strong>test_ads</strong> (<em>list</em><em> of </em><em>AnnData</em>) – List of AnnData objects from test batches (i.e., batches with a single modality).</p></li>
+<li><p><strong>use_rep</strong> (<em>str</em>) – Key in <cite>.obsm</cite> indicating the representation to use for MNN search.</p></li>
+<li><p><strong>batch_key</strong> (<em>str</em>) – Column in <cite>.obs</cite> used to identify the batch name (for logging purposes).</p></li>
+<li><p><strong>knn_base</strong> (<em>int</em><em>, </em><em>default=10</em>) – Base number of neighbors for KNN search.</p></li>
+<li><p><strong>auto_knn</strong> (<em>bool</em><em>, </em><em>default=False</em>) – Whether to automatically adjust KNN size based on batch sizes.</p></li>
+<li><p><strong>auto_thr</strong> (<em>float</em><em>, </em><em>default=0.8</em>) – Size ratio threshold for determining asymmetric KNNs in <cite>auto_knn</cite> mode.</p></li>
+<li><p><strong>rmv_outlier</strong> (<em>bool</em><em>, </em><em>default=False</em>) – Whether to apply spatial outlier removal using Isolation Forest.</p></li>
+<li><p><strong>contamination</strong> (<em>str</em><em> or </em><em>float</em><em>, </em><em>default='auto'</em>) – Proportion of outliers when using Isolation Forest.</p></li>
+<li><p><strong>seed</strong> (<em>int</em><em>, </em><em>default=1234</em>) – Random seed used by the Isolation Forest or other stochastic operations.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A set of MNN cell barcode pairs across batches.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Set[Tuple[str, str]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spamosaic.build_graph.determine_kSize">
+<span class="sig-prename descclassname"><span class="pre">spamosaic.build_graph.</span></span><span class="sig-name descname"><span class="pre">determine_kSize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">knn_base</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_thr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spamosaic/build_graph.html#determine_kSize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spamosaic.build_graph.determine_kSize" title="Permalink to this definition"></a></dt>
+<dd><p>Dynamically determine the number of nearest neighbors for KNN search
+between two datasets of potentially imbalanced sizes.</p>
+<p>This function adjusts the KNN size based on the relative number of
+observations between <cite>adi</cite> and <cite>adj</cite>. If the dataset sizes are
+sufficiently similar (i.e., ratio &gt;= <cite>auto_thr</cite>), both sides use the
+same base KNN. Otherwise, the smaller dataset uses a scaled-down KNN
+count to balance the search.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adi</strong> (<em>AnnData</em>) – First AnnData object.</p></li>
+<li><p><strong>adj</strong> (<em>AnnData</em>) – Second AnnData object.</p></li>
+<li><p><strong>knn_base</strong> (<em>int</em>) – Base number of nearest neighbors.</p></li>
+<li><p><strong>auto_thr</strong> (<em>float</em>) – Size similarity threshold (e.g., 0.8). If the ratio of smaller to
+larger dataset exceeds this, no scaling is applied.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Tuple of (knn_adi, knn_adj) representing KNN sizes for each dataset.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[int, int]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spamosaic.build_graph.remove_outlier">
+<span class="sig-prename descclassname"><span class="pre">spamosaic.build_graph.</span></span><span class="sig-name descname"><span class="pre">remove_outlier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mnn_set</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ad1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ad2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contamination</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spamosaic/build_graph.html#remove_outlier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spamosaic.build_graph.remove_outlier" title="Permalink to this definition"></a></dt>
+<dd><p>Remove outlier cell pairs from an MNN set based on spatial distance patterns.</p>
+<p>This function uses an Isolation Forest model to detect and remove spatial
+outlier cell pairs from a set of mutual nearest neighbors (MNNs). It constructs
+a feature matrix based on spatial coordinates from both datasets and their
+differences, then filters out pairs classified as outliers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mnn_set</strong> (<em>set</em><em> of </em><em>tuple</em><em>[</em><em>str</em><em>, </em><em>str</em><em>]</em>) – Set of MNN cell pairs represented by (cell_id_1, cell_id_2).</p></li>
+<li><p><strong>ad1</strong> (<em>AnnData</em>) – First AnnData object containing ‘spatial’ in <cite>.obsm</cite>.</p></li>
+<li><p><strong>ad2</strong> (<em>AnnData</em>) – Second AnnData object containing ‘spatial’ in <cite>.obsm</cite>.</p></li>
+<li><p><strong>contamination</strong> (<em>str</em><em> or </em><em>float</em><em>, </em><em>default='auto'</em>) – The amount of contamination (i.e., expected proportion of outliers)
+used to define the threshold in the Isolation Forest. Follows scikit-learn’s
+format.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Filtered MNN set with spatial outliers removed.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>set of tuple[str, str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="spamosaic.build_graph.Cal_Spatial_Net.html#spamosaic.build_graph.Cal_Spatial_Net" title="spamosaic.build_graph.Cal_Spatial_Net"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Cal_Spatial_Net</span></code></a></p></td>
+<td><p>Construct spatial graph from spatial coordinates using radius or kNN method.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="spamosaic.build_graph.build_intra_graph.html#spamosaic.build_graph.build_intra_graph" title="spamosaic.build_graph.build_intra_graph"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_intra_graph</span></code></a></p></td>
+<td><p>Construct intra-batch graphs for a list of AnnData objects.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="spamosaic.build_graph.build_mnn_graph.html#spamosaic.build_graph.build_mnn_graph" title="spamosaic.build_graph.build_mnn_graph"><code class="xref py py-obj docutils literal notranslate"><span class="pre">build_mnn_graph</span></code></a></p></td>
+<td><p>Build a mutual nearest neighbor (MNN) graph within a single modality.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="spamosaic.build_graph.determine_kSize.html#spamosaic.build_graph.determine_kSize" title="spamosaic.build_graph.determine_kSize"><code class="xref py py-obj docutils literal notranslate"><span class="pre">determine_kSize</span></code></a></p></td>
+<td><p>Dynamically determine the number of nearest neighbors for KNN search between two datasets of potentially imbalanced sizes.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="spamosaic.build_graph.remove_outlier.html#spamosaic.build_graph.remove_outlier" title="spamosaic.build_graph.remove_outlier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_outlier</span></code></a></p></td>
+<td><p>Remove outlier cell pairs from an MNN set based on spatial distance patterns.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../spamosaic.html" class="btn btn-neutral float-left" title="API Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="spamosaic.build_graph.Cal_Spatial_Net.html" class="btn btn-neutral float-right" title="spamosaic.build_graph.Cal_Spatial_Net" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

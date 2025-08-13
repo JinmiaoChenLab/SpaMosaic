@@ -1,0 +1,7 @@
+model:
+  dropout: 0.2
+  hid_dim: 128
+  n_dec_l: 1
+  n_layer: 2
+  out_dim: 32
+  slope: 0.2

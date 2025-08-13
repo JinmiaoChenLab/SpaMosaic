@@ -1,0 +1,153 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mosaic Integration &mdash; spamosaic v1.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=9af0dbfa" />
+
+  
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=393fe109"></script>
+      <script src="../../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Integrate a simulated mosaic dataset" href="Simulations_with_batch_effects.html" />
+    <link rel="prev" title="Integrate RNA+Protein in Tonsil section" href="../vertical/Tonsil_vertical.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            spamosaic
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../install.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../horizontal/index.html">Horizontal Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vertical/index.html">Vertical Integration</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Mosaic Integration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="Simulations_with_batch_effects.html">Integrate a simulated mosaic dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Mouse_postnatal_brain_rna%2BH3K4me3.html">Integrate a mosaic mouse brain dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="Human_tonsil_rna%2Badt.html">Integrate a mosaic tonsil dataset</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../imputation/index.html">Imputation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../spamosaic.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dataset.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html">Credits</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">spamosaic</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Tutorials</a></li>
+      <li class="breadcrumb-item active">Mosaic Integration</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/tutorials/integration/mosaic/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="mosaic-integration">
+<h1>Mosaic Integration<a class="headerlink" href="#mosaic-integration" title="Permalink to this heading"></a></h1>
+<p>We provide three examples of mosaic integration: the first integrates three simulated sections (RNA + protein)
+, the second integrates three mouse brain sections (RNA + H3K4me3)
+, and the third integrates three human tonsillar sections (RNA+protein).</p>
+<div class="tutorial-grid docutils container">
+<table class="docutils align-center">
+<colgroup>
+<col style="width: 33.3%" />
+<col style="width: 33.3%" />
+<col style="width: 33.3%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><a class="reference internal image-reference" href="../../../_images/simulation_mosaic.jpg"><img alt="../../../_images/simulation_mosaic.jpg" class="align-center" src="../../../_images/simulation_mosaic.jpg" style="width: 120px;" /></a>
+<p><a class="reference internal" href="Simulations_with_batch_effects.html"><span class="doc">Simulation (RNA+Protein, 3 sections)</span></a></p>
+</td>
+<td><a class="reference internal image-reference" href="../../../_images/mb_h3k4me3_mosaic.jpg"><img alt="../../../_images/mb_h3k4me3_mosaic.jpg" class="align-center" src="../../../_images/mb_h3k4me3_mosaic.jpg" style="width: 120px;" /></a>
+<p><a class="reference internal" href="Mouse_postnatal_brain_rna%2BH3K4me3.html"><span class="doc">Mouse brain (RNA+H3K4me3, 3 sections)</span></a></p>
+</td>
+<td><a class="reference internal image-reference" href="../../../_images/tonsil_mosaic.jpg"><img alt="../../../_images/tonsil_mosaic.jpg" class="align-center" src="../../../_images/tonsil_mosaic.jpg" style="width: 120px;" /></a>
+<p><a class="reference internal" href="Human_tonsil_rna%2Badt.html"><span class="doc">Tonsil (RNA+Protein, 3 sections)</span></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../vertical/Tonsil_vertical.html" class="btn btn-neutral float-left" title="Integrate RNA+Protein in Tonsil section" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Simulations_with_batch_effects.html" class="btn btn-neutral float-right" title="Integrate a simulated mosaic dataset" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

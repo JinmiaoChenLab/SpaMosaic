@@ -1,0 +1,354 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "9f7fcdb7",
+   "metadata": {},
+   "source": [
+    "# Impute Protein from RNA (Tonsil dataset)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "9a4662b9",
+   "metadata": {},
+   "source": [
+    "In this notebook, we used SpaMosaic to impute the missing protein expressions in a tonsillar dataset. The dataset consists of three sections, all measured by 10x Genomics Visium RNA and protein co-profiling technology. We removed the protein data from the first section, trained SpaMosaic on the modified dataset, and then imputed the protein expression for the first section based on RNA. \n",
+    "\n",
+    "Data used in this notebook can be downloaded from [google drive](https://drive.google.com/drive/folders/1ZeZr0Y2LQPnclFSm7JVqE6hZerXb7RF5?usp=drive_link)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "7ab2d3b2",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import os\n",
+    "import numpy as np\n",
+    "import scanpy as sc\n",
+    "import scipy.sparse as sps\n",
+    "from os.path import join\n",
+    "\n",
+    "from spamosaic.framework import SpaMosaic"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "7a2d0be7",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "os.environ['CUBLAS_WORKSPACE_CONFIG'] = ':4096:8'  # for CuBLAS operation and you have CUDA >= 10.2\n",
+    "import spamosaic.utils as utls\n",
+    "from spamosaic.preprocessing import RNA_preprocess, ADT_preprocess, Epigenome_preprocess"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "ca0afc4e",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "ad1_rna = sc.read_h5ad('./s1_adata_rna.h5ad')\n",
+    "ad1_adt = sc.read_h5ad('./s1_adata_adt.h5ad')\n",
+    "ad2_rna = sc.read_h5ad('./s2_adata_rna.h5ad')\n",
+    "ad2_adt = sc.read_h5ad('./s2_adata_adt.h5ad')\n",
+    "ad3_rna = sc.read_h5ad('./s3_adata_rna.h5ad')\n",
+    "ad3_adt = sc.read_h5ad('./s3_adata_adt.h5ad')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "444c6076",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "shared_adt = ad1_adt.var_names.intersection(ad2_adt.var_names).intersection(ad3_adt.var_names)\n",
+    "ad1_adt = ad1_adt[:, shared_adt].copy()\n",
+    "ad2_adt = ad2_adt[:, shared_adt].copy()\n",
+    "ad3_adt = ad3_adt[:, shared_adt].copy()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "b4a33fb8",
+   "metadata": {},
+   "source": [
+    "### 1st-fold cv (cross validation)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "cd1415c4",
+   "metadata": {},
+   "source": [
+    "Similar to integration, SpaMosaic performs modality alignment first and then imputes the missing modality profiles based on the modal-aligned latent space. Also, SpaMosaic requires the input dataset in the following format:\n",
+    "``` Python\n",
+    "{\n",
+    "    'rna':      [adata1_rna, adata2_rna,   None,         adata4_rna, ...],\n",
+    "    'protein':  [adata1_adt, None,         adata3_adt,   None,       ...],\n",
+    "    'atac':     [None,       adata2_atac,  None,         None,       ...],\n",
+    "    'histone':  [None,       None      ,   adata3_hist,  None,       ...],\n",
+    "    ...\n",
+    "}\n",
+    "```\n",
+    "\n",
+    "In the dictionary, each key represents a modality and each modality key corresponds to list of `anndata` objects. Each `anndata` object contains modality-specific information for a particular section. For example, the first object `adata1_rna` under the 'rna' key holds the RNA profiles for the first section, while the first object `adata1_adt` under the 'protein' key holds protein profiles for the same section. If a section is not measured for a particular modality, its value in the list is `None`. For instance, the first element under the 'atac' and 'histone' keys is `None`, indicating that the first section was not measured with ATAC or histone modality. All lists have the same length, which corresponds to the number of sections in the target dataset.\n",
+    "\n",
+    "\n",
+    "SpaMosaic requires the modalities in a mosaic dataset to be directly or indirectly connected through one or multiple sections. If a pair of modalities occur in the same section, there is a direct connection between this pair of modalities, while an indirect connection requires multiple intermediary direct connections. \n",
+    "\n",
+    "SpaMosaic will automatically impute all the missing profiles in the input. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "d85d3603",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "input_dict = {\n",
+    "    'rna': [ad1_rna, ad2_rna, ad3_rna],\n",
+    "    'adt': [None,    ad2_adt, ad3_adt]\n",
+    "}\n",
+    "\n",
+    "input_key = 'dimred_bc'"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "0187cae3",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Use GPU mode.\n",
+      "\tInitialization is completed.\n",
+      "\tCompleted 1 / 10 iteration(s).\n",
+      "\tCompleted 2 / 10 iteration(s).\n",
+      "\tCompleted 3 / 10 iteration(s).\n",
+      "\tCompleted 4 / 10 iteration(s).\n",
+      "\tCompleted 5 / 10 iteration(s).\n",
+      "Reach convergence after 5 iteration(s).\n",
+      "Use GPU mode.\n",
+      "\tInitialization is completed.\n",
+      "\tCompleted 1 / 10 iteration(s).\n",
+      "\tCompleted 2 / 10 iteration(s).\n",
+      "\tCompleted 3 / 10 iteration(s).\n",
+      "Reach convergence after 3 iteration(s).\n"
+     ]
+    }
+   ],
+   "source": [
+    "RNA_preprocess(input_dict['rna'], batch_corr=True, favor='scanpy', n_hvg=5000, batch_key='src', key=input_key)\n",
+    "ADT_preprocess(input_dict['adt'], batch_corr=True, batch_key='src', key=input_key)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "72f7b40f",
+   "metadata": {},
+   "source": [
+    "### training"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "0f54c01b",
+   "metadata": {},
+   "source": [
+    "SpaMosaic employs modality-specific graph neural networks to embed each modality's input into latent space. In horizontal integration, all sections have only one modality, thus each section has only one set of embeddings. \n",
+    "\n",
+    "The crucial parameters include:\n",
+    "- `intra_knns`: how many nearest neighbors to consider when searching for spatial neighbors within each section (list or integer)\n",
+    "- `inter_knn_base`: how many nearest neighbors to consider when searching for mutual nearest neighbors between sections (integer)\n",
+    "- `w_g`: the weight for spatial-adjacency graph\n",
+    "\n",
+    "The following parameters are recommended to use in complex integration scenarios, like varying resolution or size across sections\n",
+    "- `smooth_input`: whethere to smooth the input representations (bool)\n",
+    "- `smooth_L`: number of LGCN layers for smoothing input\n",
+    "- `inter_auto_knn`: whether to automatically balance the kNN during MNN searching (bool)\n",
+    "- `rmv_outlier`: whether to remove outlier of MNN (bool)\n",
+    "- `contamination`: percentage of removed MNN outlier\n",
+    "\n",
+    "for training:\n",
+    "- `net`: which graph neural network to use (only support wlgcn now)\n",
+    "- `lr`: learning rate\n",
+    "- `n_epochs`: number of training epochs\n",
+    "- `w_rec_g`: the loss weight for reconstructing original graph structure. If the target dataset contains protein modality, we recommend a low value for w_rec_g (e.g., 0); if it contains epigenome modality, we recommend a high value for w_rec_g (e.g., 1)."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "id": "06091cac",
+   "metadata": {
+    "scrolled": true
+   },
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "batch0: ['rna']\n",
+      "batch1: ['rna', 'adt']\n",
+      "batch2: ['rna', 'adt']\n",
+      "------Calculating spatial graph...\n",
+      "The graph contains 43260 edges, 4326 cells.\n",
+      "10.0000 neighbors per cell on average.\n",
+      "------Calculating spatial graph...\n",
+      "The graph contains 45190 edges, 4519 cells.\n",
+      "10.0000 neighbors per cell on average.\n",
+      "------Calculating spatial graph...\n",
+      "The graph contains 45210 edges, 4521 cells.\n",
+      "10.0000 neighbors per cell on average.\n",
+      "------Calculating spatial graph...\n",
+      "The graph contains 45190 edges, 4519 cells.\n",
+      "10.0000 neighbors per cell on average.\n",
+      "------Calculating spatial graph...\n",
+      "The graph contains 45210 edges, 4521 cells.\n",
+      "10.0000 neighbors per cell on average.\n",
+      "Searching MNN within rna\n",
+      "Finding MNN between (s2, s3) using KNN (10, 10)\n",
+      "Finding MNN between (s2, s1) using KNN (10, 10)\n",
+      "Finding MNN between (s3, s1) using KNN (10, 10)\n",
+      "Number of mnn pairs for rna:45291\n",
+      "Searching MNN within adt\n",
+      "Finding MNN between (s2, s3) using KNN (10, 10)\n",
+      "Number of mnn pairs for adt:13663\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "100%|███████████████████████████████████████████████████████████████████████████████████| 100/100 [00:05<00:00, 17.24it/s]\n"
+     ]
+    }
+   ],
+   "source": [
+    "model = SpaMosaic(\n",
+    "    modBatch_dict=input_dict, input_key=input_key,\n",
+    "    batch_key='src', intra_knns=10, inter_knn_base=10, w_g=0.8, \n",
+    "    seed=1234, \n",
+    "    device='cuda:0'\n",
+    ")\n",
+    "\n",
+    "model.train(net='wlgcn', lr=0.01, T=0.01, n_epochs=100)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "83128dab",
+   "metadata": {},
+   "source": [
+    "### inference\n",
+    "\n",
+    "After training, SpaMosaic can infer the modality-specific embedding for each section. These embeddings will be directly saved in original `anndata` objects. For example, the RNA-specific embeddings can be accessed by `ad1_rna.obsm['emb']`, `ad2_rna.obsm['emb']`, ... . The protein-specific embeddings can be accessed by `ad2_adt.obsm['emb']`, `ad3_adt.obsm['emb']`."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "id": "b1c490ff",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "ad_embs = model.infer_emb(input_dict, emb_key='emb', final_latent_key='merged_emb')"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "0cbdaac5",
+   "metadata": {},
+   "source": [
+    "### imputation"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "e9ea434b",
+   "metadata": {},
+   "source": [
+    "SpaMosaic employs a kNN-based strategy for imputation. One of its key advantages is that, after obtaining the modality-aligned latent space, SpaMosaic can directly impute multiple types of assays—such as peak counts, gene activity scores (GAS), and chromatin silence scores (CSS)—without the need to train multiple regression models.\n",
+    "\n",
+    "Since SpaMosaic performs imputation by aggregating the measured profiles from other sections, we need to specify the reference assays in the `.layers` for each reference anndata object. For example, we aim to impute the missing protein expressions for the first section and then we set the `.layers['counts']` as the raw protein counts data for `ad2_adt` and `ad3_adt`. Note that even though RNA imputation is not required in this notebook, it is still necessary to specify the `.layers['counts']` for each rna anndata object. "
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "id": "9efc22f2",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "for mod, ads in input_dict.items():\n",
+    "    for ad in ads:\n",
+    "        if ad is not None:\n",
+    "            ad.layers['counts'] = ad.X.copy()  # set targeting layers"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "id": "69df93fb",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "impute adt-counts for batch-1\n"
+     ]
+    }
+   ],
+   "source": [
+    "imputed_featureDict = model.impute(input_dict, emb_key='emb', layer_key='counts', imp_knn=10)\n",
+    "\n",
+    "# format of imputed_featureDict\n",
+    "# {\n",
+    "#     'rna':  [None, None, None],\n",
+    "#     'adt': [array, None, None]\n",
+    "# }"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "b49269d7",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.8.13"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}

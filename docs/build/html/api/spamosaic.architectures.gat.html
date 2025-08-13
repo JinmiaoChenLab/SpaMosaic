@@ -1,0 +1,263 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>spamosaic.architectures.gat &mdash; spamosaic v1.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=9af0dbfa" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=393fe109"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="spamosaic.architectures.gat.GAT" href="spamosaic.architectures.gat.GAT.html" />
+    <link rel="prev" title="spamosaic.architectures" href="spamosaic.architectures.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            spamosaic
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../spamosaic.html">API Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="spamosaic.build_graph.html">spamosaic.build_graph</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spamosaic.framework.html">spamosaic.framework</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spamosaic.loss.html">spamosaic.loss</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spamosaic.MNN.html">spamosaic.MNN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spamosaic.preprocessing.html">spamosaic.preprocessing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spamosaic.train_utils.html">spamosaic.train_utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spamosaic.utils.html">spamosaic.utils</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="spamosaic.architectures.html">spamosaic.architectures</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">spamosaic.architectures.gat</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#spamosaic.architectures.gat.GAT"><code class="docutils literal notranslate"><span class="pre">GAT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#spamosaic.architectures.gat.GATConv"><code class="docutils literal notranslate"><span class="pre">GATConv</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="spamosaic.architectures.gat.GAT.html">spamosaic.architectures.gat.GAT</a></li>
+<li class="toctree-l4"><a class="reference internal" href="spamosaic.architectures.gat.GATConv.html">spamosaic.architectures.gat.GATConv</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="spamosaic.architectures.wlgcn.html">spamosaic.architectures.wlgcn</a></li>
+<li class="toctree-l3"><a class="reference internal" href="spamosaic.architectures.hg_lgcn.html">spamosaic.architectures.hg_lgcn</a></li>
+<li class="toctree-l3"><a class="reference internal" href="spamosaic.architectures.hgt.html">spamosaic.architectures.hgt</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../dataset.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../credits.html">Credits</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">spamosaic</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../spamosaic.html">API Documentation</a></li>
+          <li class="breadcrumb-item"><a href="spamosaic.architectures.html">spamosaic.architectures</a></li>
+      <li class="breadcrumb-item active">spamosaic.architectures.gat</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/spamosaic.architectures.gat.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-spamosaic.architectures.gat">
+<span id="spamosaic-architectures-gat"></span><h1>spamosaic.architectures.gat<a class="headerlink" href="#module-spamosaic.architectures.gat" title="Permalink to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="spamosaic.architectures.gat.GAT">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spamosaic.architectures.gat.</span></span><span class="sig-name descname"><span class="pre">GAT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hidden_dims</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spamosaic/architectures/gat.html#GAT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spamosaic.architectures.gat.GAT" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>A 4-layer Graph Attention Network used for spatial transcriptomics.</p>
+<p>This module implements a symmetric encoder-decoder GAT with tied weights.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>hidden_dims</strong> (<em>list</em><em> of </em><em>int</em>) – A list [in_dim, hidden_dim, out_dim] specifying the feature dimensions.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="spamosaic.architectures.gat.GAT.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">features</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spamosaic/architectures/gat.html#GAT.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spamosaic.architectures.gat.GAT.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Forward pass of the GAT model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>features</strong> (<em>Tensor</em>) – Input node features.</p></li>
+<li><p><strong>edge_index</strong> (<em>Tensor</em>) – Edge indices in COO format.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>Latent embeddings after encoder (normalized).</p></li>
+<li><p>Reconstructed features after decoder.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[Tensor, Tensor]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spamosaic.architectures.gat.GAT.training">
+<span class="sig-name descname"><span class="pre">training</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#spamosaic.architectures.gat.GAT.training" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="spamosaic.architectures.gat.GATConv">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spamosaic.architectures.gat.</span></span><span class="sig-name descname"><span class="pre">GATConv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_channels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_channels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">heads</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">negative_slope</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">add_self_loops</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bias</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spamosaic/architectures/gat.html#GATConv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spamosaic.architectures.gat.GATConv" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">MessagePassing</span></code></p>
+<p>Graph Attention Network (GAT) layer adapted from STAGATE implementation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>in_channels</strong> (<em>int</em><em> or </em><em>tuple</em><em> of </em><em>int</em>) – Dimension(s) of input node features.</p></li>
+<li><p><strong>out_channels</strong> (<em>int</em>) – Dimension of output node features.</p></li>
+<li><p><strong>heads</strong> (<em>int</em><em>, </em><em>default=1</em>) – Number of attention heads.</p></li>
+<li><p><strong>concat</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Whether to concatenate multi-head outputs (True) or average them (False).</p></li>
+<li><p><strong>negative_slope</strong> (<em>float</em><em>, </em><em>default=0.2</em>) – LeakyReLU angle of the negative slope.</p></li>
+<li><p><strong>dropout</strong> (<em>float</em><em>, </em><em>default=0.0</em>) – Dropout probability for attention coefficients.</p></li>
+<li><p><strong>add_self_loops</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Whether to add self-loops to the input graph.</p></li>
+<li><p><strong>bias</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Whether to add bias (not used here).</p></li>
+<li><p><strong>**kwargs</strong> (<em>optional</em>) – Additional arguments for <cite>MessagePassing</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="spamosaic.architectures.gat.GATConv.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Tensor</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Tensor</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">SparseTensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_attention_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attention</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tied_attention</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spamosaic/architectures/gat.html#GATConv.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spamosaic.architectures.gat.GATConv.forward" title="Permalink to this definition"></a></dt>
+<dd><p>Forward pass for the GAT layer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>Tensor</em><em> or </em><em>tuple</em><em> of </em><em>Tensors</em>) – Input node features, shape (N, F).</p></li>
+<li><p><strong>edge_index</strong> (<em>Tensor</em><em> or </em><em>SparseTensor</em>) – Graph connectivity in COO format.</p></li>
+<li><p><strong>size</strong> (<em>tuple</em><em> of </em><em>int</em><em>, </em><em>optional</em>) – Size of source and target node sets.</p></li>
+<li><p><strong>return_attention_weights</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to return attention weights along with output.</p></li>
+<li><p><strong>attention</strong> (<em>bool</em><em>, </em><em>default=True</em>) – Whether to apply attention mechanism.</p></li>
+<li><p><strong>tied_attention</strong> (<em>tuple</em><em> of </em><em>Tensors</em><em>, </em><em>optional</em>) – Precomputed attention weights to reuse.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>out</strong> (<em>Tensor</em>) – Output node embeddings.</p></li>
+<li><p><strong>attention_weights</strong> (<em>optional</em>) – Attention weights (if <cite>return_attention_weights</cite> is True).</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spamosaic.architectures.gat.GATConv.message">
+<span class="sig-name descname"><span class="pre">message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_j</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_j</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha_i</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ptr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size_i</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="reference internal" href="../_modules/spamosaic/architectures/gat.html#GATConv.message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spamosaic.architectures.gat.GATConv.message" title="Permalink to this definition"></a></dt>
+<dd><p>Message passing step: applies attention-weighted aggregation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x_j</strong> (<em>Tensor</em>) – Features of source nodes.</p></li>
+<li><p><strong>alpha_j</strong> (<em>Tensor</em>) – Attention logits from source nodes.</p></li>
+<li><p><strong>alpha_i</strong> (<em>Tensor</em><em> or </em><em>None</em>) – Attention logits from target nodes.</p></li>
+<li><p><strong>index</strong> (<em>Tensor</em>) – Target indices for aggregation.</p></li>
+<li><p><strong>ptr</strong> (<em>Tensor</em><em> or </em><em>None</em>) – Optional pointer array for variable-sized batches.</p></li>
+<li><p><strong>size_i</strong> (<em>int</em><em>, </em><em>optional</em>) – Number of target nodes.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Aggregated node features after attention weighting.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<p class="rubric">Classes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="spamosaic.architectures.gat.GAT.html#spamosaic.architectures.gat.GAT" title="spamosaic.architectures.gat.GAT"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GAT</span></code></a></p></td>
+<td><p>A 4-layer Graph Attention Network used for spatial transcriptomics.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="spamosaic.architectures.gat.GATConv.html#spamosaic.architectures.gat.GATConv" title="spamosaic.architectures.gat.GATConv"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GATConv</span></code></a></p></td>
+<td><p>Graph Attention Network (GAT) layer adapted from STAGATE implementation.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="spamosaic.architectures.html" class="btn btn-neutral float-left" title="spamosaic.architectures" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="spamosaic.architectures.gat.GAT.html" class="btn btn-neutral float-right" title="spamosaic.architectures.gat.GAT" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

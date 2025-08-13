@@ -1,0 +1,359 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Impute ATAC from RNA (Mouse brain dataset) &mdash; spamosaic v1.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/nbsphinx-code-cells.css?v=2aa19091" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=9af0dbfa" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=393fe109"></script>
+      <script src="../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Impute Protein from RNA (Tonsil dataset)" href="Human_tonsil_rna%2Badt.html" />
+    <link rel="prev" title="Imputation" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            spamosaic
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../integration/horizontal/index.html">Horizontal Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../integration/vertical/index.html">Vertical Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../integration/mosaic/index.html">Mosaic Integration</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Imputation</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Impute ATAC from RNA (Mouse brain dataset)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#1st-fold-cv-(cross-validation)">1st-fold cv (cross validation)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#training">training</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#inference">inference</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#imputation">imputation</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="Human_tonsil_rna%2Badt.html">Impute Protein from RNA (Tonsil dataset)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../spamosaic.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dataset.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../credits.html">Credits</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">spamosaic</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Tutorials</a></li>
+          <li class="breadcrumb-item"><a href="index.html">Imputation</a></li>
+      <li class="breadcrumb-item active">Impute ATAC from RNA (Mouse brain dataset)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/tutorials/imputation/Mouse_postnatal_brain_rna+atac.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Impute-ATAC-from-RNA-(Mouse-brain-dataset)">
+<h1>Impute ATAC from RNA (Mouse brain dataset)<a class="headerlink" href="#Impute-ATAC-from-RNA-(Mouse-brain-dataset)" title="Permalink to this heading"></a></h1>
+<p>In this notebook, we used SpaMosaic to impute the missing ATAC peak assays in a postnatal mouse brain dataset. The dataset consists of three sections, all measured with both RNA and ATAC profiles. We removed the ATAC profiles from the first section, trained SpaMosaic on the modified dataset, and then imputed the ATAC peak data for the first section based on RNA.</p>
+<p>Data used in this notebook can be downloaded from <a class="reference external" href="https://drive.google.com/drive/folders/1GyOvHxweRYrq8Hiq5OdKhfSowUfcMoXY?usp=drive_link">google drive</a>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">scanpy</span> <span class="k">as</span> <span class="nn">sc</span>
+<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sps</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">join</span>
+
+<span class="kn">from</span> <span class="nn">spamosaic.framework</span> <span class="kn">import</span> <span class="n">SpaMosaic</span>
+
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;CUBLAS_WORKSPACE_CONFIG&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;:4096:8&#39;</span>  <span class="c1"># for CuBLAS operation and you have CUDA &gt;= 10.2</span>
+<span class="kn">import</span> <span class="nn">spamosaic.utils</span> <span class="k">as</span> <span class="nn">utls</span>
+<span class="kn">from</span> <span class="nn">spamosaic.preprocessing</span> <span class="kn">import</span> <span class="n">RNA_preprocess</span><span class="p">,</span> <span class="n">ADT_preprocess</span><span class="p">,</span> <span class="n">Epigenome_preprocess</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ad1_rna</span>  <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">read_h5ad</span><span class="p">(</span><span class="s1">&#39;./s1_adata_rna.h5ad&#39;</span><span class="p">)</span>
+<span class="n">ad1_atac</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">read_h5ad</span><span class="p">(</span><span class="s1">&#39;./s1_adata_atac.h5ad&#39;</span><span class="p">)</span>
+<span class="n">ad2_rna</span>  <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">read_h5ad</span><span class="p">(</span><span class="s1">&#39;./s2_adata_rna.h5ad&#39;</span><span class="p">)</span>
+<span class="n">ad2_atac</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">read_h5ad</span><span class="p">(</span><span class="s1">&#39;./s2_adata_atac.h5ad&#39;</span><span class="p">)</span>
+<span class="n">ad3_rna</span>  <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">read_h5ad</span><span class="p">(</span><span class="s1">&#39;./s3_adata_rna.h5ad&#39;</span><span class="p">)</span>
+<span class="n">ad3_atac</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">read_h5ad</span><span class="p">(</span><span class="s1">&#39;./s3_adata_atac.h5ad&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<section id="1st-fold-cv-(cross-validation)">
+<h2>1st-fold cv (cross validation)<a class="headerlink" href="#1st-fold-cv-(cross-validation)" title="Permalink to this heading"></a></h2>
+<p>Similar to integration, SpaMosaic performs modality alignment first and then imputes the missing modality profiles based on the modal-aligned latent space. Also, SpaMosaic requires the input dataset in the following format:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s1">&#39;rna&#39;</span><span class="p">:</span>      <span class="p">[</span><span class="n">adata1_rna</span><span class="p">,</span> <span class="n">adata2_rna</span><span class="p">,</span>   <span class="kc">None</span><span class="p">,</span>         <span class="n">adata4_rna</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span>
+    <span class="s1">&#39;protein&#39;</span><span class="p">:</span>  <span class="p">[</span><span class="n">adata1_adt</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>         <span class="n">adata3_adt</span><span class="p">,</span>   <span class="kc">None</span><span class="p">,</span>       <span class="o">...</span><span class="p">],</span>
+    <span class="s1">&#39;atac&#39;</span><span class="p">:</span>     <span class="p">[</span><span class="kc">None</span><span class="p">,</span>       <span class="n">adata2_atac</span><span class="p">,</span>  <span class="kc">None</span><span class="p">,</span>         <span class="kc">None</span><span class="p">,</span>       <span class="o">...</span><span class="p">],</span>
+    <span class="s1">&#39;histone&#39;</span><span class="p">:</span>  <span class="p">[</span><span class="kc">None</span><span class="p">,</span>       <span class="kc">None</span>      <span class="p">,</span>   <span class="n">adata3_hist</span><span class="p">,</span>  <span class="kc">None</span><span class="p">,</span>       <span class="o">...</span><span class="p">],</span>
+    <span class="o">...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>In the dictionary, each key represents a modality and each modality key corresponds to list of <code class="docutils literal notranslate"><span class="pre">anndata</span></code> objects. Each <code class="docutils literal notranslate"><span class="pre">anndata</span></code> object contains modality-specific information for a particular section. For example, the first object <code class="docutils literal notranslate"><span class="pre">adata1_rna</span></code> under the ‘rna’ key holds the RNA profiles for the first section, while the first object <code class="docutils literal notranslate"><span class="pre">adata1_adt</span></code> under the ‘protein’ key holds protein profiles for the same section. If a section is not measured for a particular modality, its value in the list
+is <code class="docutils literal notranslate"><span class="pre">None</span></code>. For instance, the first element under the ‘atac’ and ‘histone’ keys is <code class="docutils literal notranslate"><span class="pre">None</span></code>, indicating that the first section was not measured with ATAC or histone modality. All lists have the same length, which corresponds to the number of sections in the target dataset.</p>
+<p>SpaMosaic requires the modalities in a mosaic dataset to be directly or indirectly connected through one or multiple sections. If a pair of modalities occur in the same section, there is a direct connection between this pair of modalities, while an indirect connection requires multiple intermediary direct connections.</p>
+<p>SpaMosaic will automatically impute all the missing profiles in the input.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">input_dict</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;rna&#39;</span><span class="p">:</span>  <span class="p">[</span><span class="n">ad1_rna</span><span class="p">,</span> <span class="n">ad2_rna</span><span class="p">,</span>  <span class="n">ad3_rna</span><span class="p">],</span>
+    <span class="s1">&#39;atac&#39;</span><span class="p">:</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span>    <span class="n">ad2_atac</span><span class="p">,</span> <span class="n">ad3_atac</span><span class="p">]</span>
+<span class="p">}</span>
+
+<span class="n">input_key</span> <span class="o">=</span> <span class="s1">&#39;dimred_bc&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">RNA_preprocess</span><span class="p">(</span><span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;rna&#39;</span><span class="p">],</span> <span class="n">batch_corr</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">n_hvg</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span> <span class="n">batch_key</span><span class="o">=</span><span class="s1">&#39;src&#39;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">input_key</span><span class="p">)</span>
+<span class="n">hvp_name</span><span class="p">,</span> <span class="n">hvp_idx</span> <span class="o">=</span> <span class="n">Epigenome_preprocess</span><span class="p">(</span><span class="n">input_dict</span><span class="p">[</span><span class="s1">&#39;atac&#39;</span><span class="p">],</span> <span class="n">batch_corr</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">n_peak</span><span class="o">=</span><span class="mi">50000</span><span class="p">,</span> <span class="n">batch_key</span><span class="o">=</span><span class="s1">&#39;src&#39;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">input_key</span><span class="p">,</span> <span class="n">return_hvf</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Use GPU mode.
+        Initialization is completed.
+        Completed 1 / 10 iteration(s).
+        Completed 2 / 10 iteration(s).
+        Completed 3 / 10 iteration(s).
+Reach convergence after 3 iteration(s).
+Use GPU mode.
+        Initialization is completed.
+        Completed 1 / 10 iteration(s).
+        Completed 2 / 10 iteration(s).
+        Completed 3 / 10 iteration(s).
+        Completed 4 / 10 iteration(s).
+Reach convergence after 4 iteration(s).
+</pre></div></div>
+</div>
+</section>
+<section id="training">
+<h2>training<a class="headerlink" href="#training" title="Permalink to this heading"></a></h2>
+<p>SpaMosaic employs modality-specific graph neural networks to embed each modality’s input into latent space. In horizontal integration, all sections have only one modality, thus each section has only one set of embeddings.</p>
+<p>The crucial parameters include:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">intra_knns</span></code>: how many nearest neighbors to consider when searching for spatial neighbors within each section (list or integer)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">inter_knn_base</span></code>: how many nearest neighbors to consider when searching for mutual nearest neighbors between sections (integer)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">w_g</span></code>: the weight for spatial-adjacency graph</p></li>
+</ul>
+<p>The following parameters are recommended to use in complex integration scenarios, like varying resolution or size across sections</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">smooth_input</span></code>: whethere to smooth the input representations (bool)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">smooth_L</span></code>: number of LGCN layers for smoothing input</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">inter_auto_knn</span></code>: whether to automatically balance the kNN during MNN searching (bool)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rmv_outlier</span></code>: whether to remove outlier of MNN (bool)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">contamination</span></code>: percentage of removed MNN outlier</p></li>
+</ul>
+<p>for training:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">net</span></code>: which graph neural network to use (only support wlgcn now)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lr</span></code>: learning rate</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">n_epochs</span></code>: number of training epochs</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">w_rec_g</span></code>: the loss weight for reconstructing original graph structure. If the target dataset contains protein modality, we recommend a low value for w_rec_g (e.g., 0); if it contains epigenome modality, we recommend a high value for w_rec_g (e.g., 1).</p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model</span> <span class="o">=</span> <span class="n">SpaMosaic</span><span class="p">(</span>
+    <span class="n">modBatch_dict</span><span class="o">=</span><span class="n">input_dict</span><span class="p">,</span> <span class="n">input_key</span><span class="o">=</span><span class="n">input_key</span><span class="p">,</span>
+    <span class="n">batch_key</span><span class="o">=</span><span class="s1">&#39;src&#39;</span><span class="p">,</span> <span class="n">intra_knns</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">inter_knn_base</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">w_g</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+    <span class="n">seed</span><span class="o">=</span><span class="mi">1234</span><span class="p">,</span>
+    <span class="n">device</span><span class="o">=</span><span class="s1">&#39;cuda:0&#39;</span>
+<span class="p">)</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">net</span><span class="o">=</span><span class="s1">&#39;wlgcn&#39;</span><span class="p">,</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">T</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">n_epochs</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+batch0: [&#39;rna&#39;]
+batch1: [&#39;rna&#39;, &#39;atac&#39;]
+batch2: [&#39;rna&#39;, &#39;atac&#39;]
+------Calculating spatial graph...
+The graph contains 23720 edges, 2372 cells.
+10.0000 neighbors per cell on average.
+------Calculating spatial graph...
+The graph contains 24970 edges, 2497 cells.
+10.0000 neighbors per cell on average.
+------Calculating spatial graph...
+The graph contains 92150 edges, 9215 cells.
+10.0000 neighbors per cell on average.
+------Calculating spatial graph...
+The graph contains 24970 edges, 2497 cells.
+10.0000 neighbors per cell on average.
+------Calculating spatial graph...
+The graph contains 92150 edges, 9215 cells.
+10.0000 neighbors per cell on average.
+Searching MNN within rna
+Finding MNN between (s2, s3) using KNN (10, 10)
+Finding MNN between (s2, s1) using KNN (10, 10)
+Finding MNN between (s3, s1) using KNN (10, 10)
+Number of mnn pairs for rna:15799
+Searching MNN within atac
+Finding MNN between (s2, s3) using KNN (10, 10)
+Number of mnn pairs for atac:10190
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+100%|███████████████████████████████████████████████████████████████████████████████████| 100/100 [00:05&lt;00:00, 19.85it/s]
+</pre></div></div>
+</div>
+</section>
+<section id="inference">
+<h2>inference<a class="headerlink" href="#inference" title="Permalink to this heading"></a></h2>
+<p>After training, SpaMosaic can infer the modality-specific embedding for each section. These embeddings will be directly saved in original <code class="docutils literal notranslate"><span class="pre">anndata</span></code> objects. For example, the RNA-specific embeddings can be accessed by <code class="docutils literal notranslate"><span class="pre">ad1_rna.obsm['emb']</span></code>, <code class="docutils literal notranslate"><span class="pre">ad2_rna.obsm['emb']</span></code>, … . The ATAC-specific embeddings can be accessed by <code class="docutils literal notranslate"><span class="pre">ad2_atac.obsm['emb']</span></code>, <code class="docutils literal notranslate"><span class="pre">ad3_atac.obsm['emb']</span></code>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ad_embs</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">infer_emb</span><span class="p">(</span><span class="n">input_dict</span><span class="p">,</span> <span class="n">emb_key</span><span class="o">=</span><span class="s1">&#39;emb&#39;</span><span class="p">,</span> <span class="n">final_latent_key</span><span class="o">=</span><span class="s1">&#39;merged_emb&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="imputation">
+<h2>imputation<a class="headerlink" href="#imputation" title="Permalink to this heading"></a></h2>
+<p>SpaMosaic employs a kNN-based strategy for imputation. One of its key advantages is that, after obtaining the modality-aligned latent space, SpaMosaic can directly impute multiple types of assays—such as peak counts, gene activity scores (GAS), and chromatin silence scores (CSS)—without the need to train multiple regression models.</p>
+<p>Since SpaMosaic performs imputation by aggregating the measured profiles from other sections, we need to specify the reference assays in the <code class="docutils literal notranslate"><span class="pre">.layers</span></code> for each reference anndata object. For example, we aim to impute the missing peak assays for the first section and then we set the <code class="docutils literal notranslate"><span class="pre">.layers['counts']</span></code> as the raw peak counts data for <code class="docutils literal notranslate"><span class="pre">ad2_atac</span></code> and <code class="docutils literal notranslate"><span class="pre">ad3_atac</span></code>. If to impute the GAS, we need to transform the peak counts into GAS first for the sections 2 and 3, and set the
+<code class="docutils literal notranslate"><span class="pre">.layers['counts']</span></code> in <code class="docutils literal notranslate"><span class="pre">ad2_atac</span></code> and <code class="docutils literal notranslate"><span class="pre">ad3_atac</span></code> as corresponding GAS data. Note that even though RNA imputation is not required in this notebook, it is still necessary to specify the <code class="docutils literal notranslate"><span class="pre">.layers['counts']</span></code> for each rna anndata object.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">mod</span><span class="p">,</span> <span class="n">ads</span> <span class="ow">in</span> <span class="n">input_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">ad</span> <span class="ow">in</span> <span class="n">ads</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ad</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ad</span><span class="o">.</span><span class="n">layers</span><span class="p">[</span><span class="s1">&#39;counts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ad</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>  <span class="c1"># set targeting layers</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">imputed_featureDict</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">impute</span><span class="p">(</span><span class="n">input_dict</span><span class="p">,</span> <span class="n">emb_key</span><span class="o">=</span><span class="s1">&#39;emb&#39;</span><span class="p">,</span> <span class="n">layer_key</span><span class="o">=</span><span class="s1">&#39;counts&#39;</span><span class="p">,</span> <span class="n">imp_knn</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="c1"># format of imputed_featureDict</span>
+<span class="c1"># {</span>
+<span class="c1">#     &#39;rna&#39;:  [None, None, None],</span>
+<span class="c1">#     &#39;atac&#39;: [array, None, None]</span>
+<span class="c1"># }</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+impute atac-counts for batch-1
+</pre></div></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Imputation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Human_tonsil_rna%2Badt.html" class="btn btn-neutral float-right" title="Impute Protein from RNA (Tonsil dataset)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

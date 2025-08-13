@@ -1,0 +1,318 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>spamosaic.train_utils &mdash; spamosaic v1.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=9af0dbfa" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=393fe109"></script>
+      <script src="../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            spamosaic
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../spamosaic.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dataset.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../credits.html">Credits</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">spamosaic</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">spamosaic.train_utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for spamosaic.train_utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">gc</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span><span class="p">,</span> <span class="n">PurePath</span>
+<span class="kn">import</span> <span class="nn">scipy</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.patches</span> <span class="k">as</span> <span class="nn">mpatches</span>
+<span class="kn">import</span> <span class="nn">scanpy</span> <span class="k">as</span> <span class="nn">sc</span>
+<span class="kn">import</span> <span class="nn">h5py</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="k">as</span> <span class="nn">sps</span>
+<span class="kn">import</span> <span class="nn">scipy.io</span> <span class="k">as</span> <span class="nn">sio</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="c1"># import gzip</span>
+<span class="kn">from</span> <span class="nn">scipy.io</span> <span class="kn">import</span> <span class="n">mmread</span>
+
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">join</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">rcParams</span>
+<span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
+<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">adjusted_rand_score</span>
+<span class="kn">from</span> <span class="nn">torch_geometric.utils</span> <span class="kn">import</span> <span class="n">negative_sampling</span>
+
+<span class="kn">import</span> <span class="nn">random</span>
+<div class="viewcode-block" id="set_seeds"><a class="viewcode-back" href="../../api/spamosaic.train_utils.set_seeds.html#spamosaic.train_utils.set_seeds">[docs]</a><span class="k">def</span> <span class="nf">set_seeds</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set random seeds for reproducibility across multiple libraries.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    seed : int</span>
+<span class="sd">        Random seed to use for reproducibility.</span>
+<span class="sd">    dt : bool, default=True</span>
+<span class="sd">        Whether to enforce deterministic algorithms in PyTorch.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">manual_seed_all</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">backends</span><span class="o">.</span><span class="n">cudnn</span><span class="o">.</span><span class="n">benchmark</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">use_deterministic_algorithms</span><span class="p">(</span><span class="n">dt</span><span class="p">)</span>  <span class="c1"># ensure reproducibility</span></div>
+
+<div class="viewcode-block" id="graph_decode"><a class="viewcode-back" href="../../api/spamosaic.train_utils.graph_decode.html#spamosaic.train_utils.graph_decode">[docs]</a><span class="k">def</span> <span class="nf">graph_decode</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute edge-wise similarity scores using dot product of node embeddings.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    z : torch.Tensor</span>
+<span class="sd">        Node embeddings of shape [num_nodes, embedding_dim].</span>
+<span class="sd">    edge_index : torch.Tensor</span>
+<span class="sd">        Edge index tensor with shape [2, num_edges].</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    torch.Tensor</span>
+<span class="sd">        Edge probabilities computed via sigmoid(dot(z_i, z_j)).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logit</span> <span class="o">=</span> <span class="p">(</span><span class="n">z</span><span class="p">[</span><span class="n">edge_index</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">*</span> <span class="n">z</span><span class="p">[</span><span class="n">edge_index</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">logit</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="graph_recon_crit"><a class="viewcode-back" href="../../api/spamosaic.train_utils.graph_recon_crit.html#spamosaic.train_utils.graph_recon_crit">[docs]</a><span class="k">def</span> <span class="nf">graph_recon_crit</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">pos_edge_index</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute binary cross-entropy loss for graph reconstruction using positive and negative edges.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    z : torch.Tensor</span>
+<span class="sd">        Node embeddings of shape [num_nodes, embedding_dim].</span>
+<span class="sd">    pos_edge_index : torch.Tensor</span>
+<span class="sd">        Positive edge indices of shape [2, num_pos_edges].</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    torch.Tensor</span>
+<span class="sd">        Scalar reconstruction loss combining positive and negative samples.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">pos_loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">graph_decode</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">pos_edge_index</span><span class="p">)</span><span class="o">+</span><span class="mf">1e-20</span><span class="p">)</span>
+    <span class="n">pos_loss</span> <span class="o">=</span> <span class="n">pos_loss</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+    <span class="n">neg_edge_index</span> <span class="o">=</span> <span class="n">negative_sampling</span><span class="p">(</span>
+        <span class="n">pos_edge_index</span><span class="p">,</span> <span class="n">z</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">num_neg_samples</span><span class="o">=</span><span class="n">pos_edge_index</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="c1"># neg_edge_index = self.subgraph_negative_sampling(pos_edge_index)</span>
+    <span class="n">neg_loss</span> <span class="o">=</span> <span class="o">-</span><span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">graph_decode</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">neg_edge_index</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-20</span><span class="p">)</span>
+    <span class="n">neg_loss</span> <span class="o">=</span> <span class="n">neg_loss</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">pos_loss</span> <span class="o">+</span> <span class="n">neg_loss</span></div>
+
+<div class="viewcode-block" id="train_model"><a class="viewcode-back" href="../../api/spamosaic.train_utils.train_model.html#spamosaic.train_utils.train_model">[docs]</a><span class="k">def</span> <span class="nf">train_model</span><span class="p">(</span>
+        <span class="n">mod_model</span><span class="p">,</span> <span class="n">mod_optims</span><span class="p">,</span> <span class="n">crit1</span><span class="p">,</span> <span class="n">crit2</span><span class="p">,</span> <span class="n">loss_type</span><span class="p">,</span> <span class="n">w_rec_g</span><span class="p">,</span> 
+        <span class="n">mod_input_feat</span><span class="p">,</span> <span class="n">mod_graphs_edge</span><span class="p">,</span> <span class="n">mod_graphs_edge_w</span><span class="p">,</span> <span class="n">mod_graphs_edge_c</span><span class="p">,</span> 
+        <span class="n">batch_train_meta_numbers</span><span class="p">,</span> <span class="n">mod_batch_split</span><span class="p">,</span> 
+        <span class="n">T</span><span class="p">,</span> <span class="n">n_epochs</span><span class="p">,</span> <span class="n">device</span>
+    <span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Train multi-modal GNN model with contrastive and reconstruction losses.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mod_model : dict[str, torch.nn.Module]</span>
+<span class="sd">        Dictionary mapping modality to its encoder model.</span>
+<span class="sd">    mod_optims : dict[str, torch.optim.Optimizer]</span>
+<span class="sd">        Optimizer for each modality.</span>
+<span class="sd">    crit1 : dict[int, Callable] or torch.nn.Module</span>
+<span class="sd">        Contrastive loss function or dict of such functions per batch.</span>
+<span class="sd">    crit2 : Callable</span>
+<span class="sd">        Reconstruction loss function (e.g., MSELoss).</span>
+<span class="sd">    loss_type : str</span>
+<span class="sd">        Either &#39;adapted&#39; (multi-modality) or &#39;standard&#39; (2-modality) contrastive loss.</span>
+<span class="sd">    w_rec_g : float</span>
+<span class="sd">        Weight for graph reconstruction loss; (1 - w_rec_g) used for feature reconstruction.</span>
+<span class="sd">    mod_input_feat : dict[str, torch.Tensor]</span>
+<span class="sd">        Input features per modality.</span>
+<span class="sd">    mod_graphs_edge : dict[str, torch.Tensor]</span>
+<span class="sd">        Edge indices per modality.</span>
+<span class="sd">    mod_graphs_edge_w : dict[str, torch.Tensor]</span>
+<span class="sd">        Edge weights per modality.</span>
+<span class="sd">    mod_graphs_edge_c : dict[str, torch.Tensor]</span>
+<span class="sd">        Batch-specific edge masks (used to isolate subgraphs).</span>
+<span class="sd">    batch_train_meta_numbers : dict[int, tuple]</span>
+<span class="sd">        Metadata per batch describing whether it is bridge/test, size, and modalities.</span>
+<span class="sd">    mod_batch_split : dict[str, list[int]]</span>
+<span class="sd">        Mapping modality to list of cell counts per batch.</span>
+<span class="sd">    T : float</span>
+<span class="sd">        Temperature for contrastive loss.</span>
+<span class="sd">    n_epochs : int</span>
+<span class="sd">        Number of training epochs.</span>
+<span class="sd">    device : torch.device</span>
+<span class="sd">        Device used for training.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple</span>
+<span class="sd">        Trained model dict, list of contrastive losses, list of reconstruction losses.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">bridge_batch_num_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">bi</span> <span class="k">for</span> <span class="n">bi</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">batch_train_meta_numbers</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="n">test_batch_num_ids</span>   <span class="o">=</span> <span class="p">[</span><span class="n">bi</span> <span class="k">for</span> <span class="n">bi</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">batch_train_meta_numbers</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+    
+    <span class="n">loss_cl</span><span class="p">,</span> <span class="n">loss_rec</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_epochs</span><span class="o">+</span><span class="mi">1</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">mod_model</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span> <span class="n">mod_model</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">mod_optims</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span> <span class="n">mod_optims</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span> 
+
+        <span class="n">mod_embs</span><span class="p">,</span> <span class="n">mod_recs</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">mod_model</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">z</span><span class="p">,</span> <span class="n">r</span> <span class="o">=</span> <span class="n">mod_model</span><span class="p">[</span><span class="n">k</span><span class="p">](</span><span class="n">mod_input_feat</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">mod_graphs_edge</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">mod_graphs_edge_w</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>  <span class="c1"># outputs for all spots within each modality </span>
+            <span class="n">mod_embs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">mod_batch_split</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span>  
+            <span class="n">mod_recs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">mod_batch_split</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span>   
+        <span class="n">split_input_feat</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">mod_batch_split</span><span class="p">[</span><span class="n">k</span><span class="p">]))</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">v</span> <span class="ow">in</span> <span class="n">mod_input_feat</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>  <span class="c1"># target of reconstruction </span>
+
+        <span class="c1"># feature reconstruction</span>
+        <span class="n">l2</span><span class="p">,</span> <span class="n">l2_step</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">FloatTensor</span><span class="p">([</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">),</span> <span class="mi">0</span>  <span class="c1"># in case empty test batches</span>
+        <span class="k">for</span> <span class="n">bi</span> <span class="ow">in</span> <span class="n">test_batch_num_ids</span><span class="p">:</span>
+            <span class="n">ms</span> <span class="o">=</span> <span class="n">batch_train_meta_numbers</span><span class="p">[</span><span class="n">bi</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">ms</span><span class="p">:</span>
+                <span class="c1"># feature reconst</span>
+                <span class="n">f_rec_loss</span> <span class="o">=</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">w_rec_g</span><span class="o">==</span><span class="mi">1</span> <span class="k">else</span> <span class="n">crit2</span><span class="p">(</span><span class="n">mod_recs</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">bi</span><span class="p">],</span> <span class="n">split_input_feat</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">bi</span><span class="p">])</span> 
+                
+                <span class="k">if</span> <span class="n">w_rec_g</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="c1"># graph reconst</span>
+                    <span class="n">intra_graph_mask</span> <span class="o">=</span> <span class="n">mod_graphs_edge_c</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">==</span> <span class="n">bi</span>
+                    <span class="n">sub_graph</span> <span class="o">=</span> <span class="n">mod_graphs_edge</span><span class="p">[</span><span class="n">k</span><span class="p">][:,</span> <span class="n">intra_graph_mask</span><span class="p">]</span>
+                    <span class="n">start_idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">sub_graph</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+                    <span class="n">sub_graph_edge_index</span> <span class="o">=</span> <span class="n">sub_graph</span> <span class="o">-</span> <span class="n">start_idx</span>
+                    <span class="n">g_rec_loss</span> <span class="o">=</span> <span class="n">graph_recon_crit</span><span class="p">(</span><span class="n">mod_embs</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">bi</span><span class="p">],</span> <span class="n">sub_graph_edge_index</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">g_rec_loss</span> <span class="o">=</span> <span class="mf">0.</span>
+
+                <span class="n">l2</span> <span class="o">+=</span> <span class="n">w_rec_g</span> <span class="o">*</span> <span class="n">g_rec_loss</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">w_rec_g</span><span class="p">)</span> <span class="o">*</span> <span class="n">f_rec_loss</span>
+                <span class="n">l2_step</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># contrastive learning</span>
+        <span class="n">l1</span><span class="p">,</span> <span class="n">l1_step</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span> 
+        <span class="k">for</span> <span class="n">bi</span> <span class="ow">in</span> <span class="n">bridge_batch_num_ids</span><span class="p">:</span>
+            <span class="n">meta</span> <span class="o">=</span> <span class="n">batch_train_meta_numbers</span><span class="p">[</span><span class="n">bi</span><span class="p">]</span>
+            <span class="c1"># if setting multiple mini-batches, randomly shuffle the spots </span>
+            <span class="k">if</span> <span class="n">meta</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>                       
+                <span class="n">shuffle_ind</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randperm</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">[</span><span class="mi">5</span><span class="p">]:</span> 
+                    <span class="n">mod_embs</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">bi</span><span class="p">]</span> <span class="o">=</span> <span class="n">mod_embs</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">bi</span><span class="p">][</span><span class="n">shuffle_ind</span><span class="p">]</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="mi">3</span><span class="p">]):</span>
+                <span class="n">feat</span> <span class="o">=</span> <span class="p">[</span><span class="n">mod_embs</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">bi</span><span class="p">][</span><span class="n">i</span><span class="o">*</span><span class="n">meta</span><span class="p">[</span><span class="mi">2</span><span class="p">]:(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">meta</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">[</span><span class="mi">5</span><span class="p">]]</span>
+                <span class="k">if</span> <span class="n">loss_type</span><span class="o">==</span><span class="s1">&#39;adapted&#39;</span><span class="p">:</span>
+                    <span class="n">feat</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">feat</span><span class="p">)</span>
+                    <span class="n">l1</span> <span class="o">+=</span> <span class="n">crit1</span><span class="p">[</span><span class="n">bi</span><span class="p">]((</span><span class="n">feat</span> <span class="o">@</span> <span class="n">feat</span><span class="o">.</span><span class="n">t</span><span class="p">())</span> <span class="o">/</span> <span class="n">T</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logit</span> <span class="o">=</span> <span class="p">(</span><span class="n">feat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">@</span> <span class="n">feat</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">/</span><span class="n">T</span>
+                    <span class="n">target</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+                    <span class="n">l1</span> <span class="o">+=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">crit1</span><span class="p">[</span><span class="n">bi</span><span class="p">](</span><span class="n">logit</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span> <span class="o">+</span> <span class="n">crit1</span><span class="p">[</span><span class="n">bi</span><span class="p">](</span><span class="n">logit</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">target</span><span class="p">))</span>
+                <span class="n">l1_step</span> <span class="o">+=</span> <span class="mi">1</span>
+        
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">l1</span><span class="o">/</span><span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">l1_step</span><span class="p">)</span> <span class="o">+</span> <span class="n">l2</span><span class="o">/</span><span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">l2_step</span><span class="p">)</span> 
+
+        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">mod_optims</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span> <span class="n">mod_optims</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">l1_step</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">loss_cl</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">l1</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">l2_step</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">loss_rec</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">l2</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+
+    <span class="k">return</span> <span class="n">mod_model</span><span class="p">,</span> <span class="n">loss_cl</span><span class="p">,</span> <span class="n">loss_rec</span> </div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

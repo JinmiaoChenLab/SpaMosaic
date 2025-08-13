@@ -1,0 +1,298 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>spamosaic.MNN &mdash; spamosaic v1.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=9af0dbfa" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=393fe109"></script>
+      <script src="../../_static/doctools.js?v=888ff710"></script>
+      <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            spamosaic
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../spamosaic.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dataset.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../credits.html">Credits</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">spamosaic</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">spamosaic.MNN</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for spamosaic.MNN</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">NearestNeighbors</span>
+<span class="kn">from</span> <span class="nn">annoy</span> <span class="kn">import</span> <span class="n">AnnoyIndex</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+<span class="kn">import</span> <span class="nn">hnswlib</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">normalize</span>
+
+<div class="viewcode-block" id="nn_approx"><a class="viewcode-back" href="../../api/spamosaic.MNN.nn_approx.html#spamosaic.MNN.nn_approx">[docs]</a><span class="k">def</span> <span class="nf">nn_approx</span><span class="p">(</span><span class="n">ds1</span><span class="p">,</span> <span class="n">ds2</span><span class="p">,</span> <span class="n">names1</span><span class="p">,</span> <span class="n">names2</span><span class="p">,</span> <span class="n">knn</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Approximate nearest neighbor search using HNSW (hnswlib).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ds1 : np.ndarray</span>
+<span class="sd">        Query dataset (N1, D).</span>
+<span class="sd">    ds2 : np.ndarray</span>
+<span class="sd">        Reference dataset (N2, D).</span>
+<span class="sd">    names1 : list of str</span>
+<span class="sd">        Identifiers for rows in `ds1`.</span>
+<span class="sd">    names2 : list of str</span>
+<span class="sd">        Identifiers for rows in `ds2`.</span>
+<span class="sd">    knn : int, default=50</span>
+<span class="sd">        Number of nearest neighbors to find.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Set[Tuple[str, str]]</span>
+<span class="sd">        Set of matched (query_name, reference_name) pairs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">ds2</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">num_elements</span> <span class="o">=</span> <span class="n">ds2</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">hnswlib</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="n">space</span><span class="o">=</span><span class="s1">&#39;l2&#39;</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="n">dim</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">init_index</span><span class="p">(</span><span class="n">max_elements</span><span class="o">=</span><span class="n">num_elements</span><span class="p">,</span> <span class="n">ef_construction</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">M</span> <span class="o">=</span> <span class="mi">16</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">set_ef</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">p</span><span class="o">.</span><span class="n">add_items</span><span class="p">(</span><span class="n">ds2</span><span class="p">)</span>
+    <span class="n">ind</span><span class="p">,</span>  <span class="n">distances</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">knn_query</span><span class="p">(</span><span class="n">ds1</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">knn</span><span class="p">)</span>
+    <span class="n">match</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">ds1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">ind</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">b_i</span> <span class="ow">in</span> <span class="n">b</span><span class="p">:</span>
+            <span class="k">match</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">names1</span><span class="p">[</span><span class="n">a</span><span class="p">],</span> <span class="n">names2</span><span class="p">[</span><span class="n">b_i</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="n">match</span></div>
+
+
+<div class="viewcode-block" id="nn"><a class="viewcode-back" href="../../api/spamosaic.MNN.nn.html#spamosaic.MNN.nn">[docs]</a><span class="k">def</span> <span class="nf">nn</span><span class="p">(</span><span class="n">ds1</span><span class="p">,</span> <span class="n">ds2</span><span class="p">,</span> <span class="n">names1</span><span class="p">,</span> <span class="n">names2</span><span class="p">,</span> <span class="n">knn</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">metric_p</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Exact nearest neighbor search using scikit-learn.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ds1 : np.ndarray</span>
+<span class="sd">        Query dataset.</span>
+<span class="sd">    ds2 : np.ndarray</span>
+<span class="sd">        Reference dataset.</span>
+<span class="sd">    names1 : list of str</span>
+<span class="sd">        Identifiers for `ds1`.</span>
+<span class="sd">    names2 : list of str</span>
+<span class="sd">        Identifiers for `ds2`.</span>
+<span class="sd">    knn : int</span>
+<span class="sd">        Number of nearest neighbors.</span>
+<span class="sd">    metric_p : int</span>
+<span class="sd">        Minkowski distance parameter (e.g., 2 for Euclidean).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Set[Tuple[str, str]]</span>
+<span class="sd">        Set of matched nearest neighbor pairs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Find nearest neighbors of first dataset.</span>
+    <span class="n">nn_</span> <span class="o">=</span> <span class="n">NearestNeighbors</span><span class="p">(</span><span class="n">knn</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">metric_p</span><span class="p">)</span>
+    <span class="n">nn_</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">ds2</span><span class="p">)</span>
+    <span class="n">ind</span> <span class="o">=</span> <span class="n">nn_</span><span class="o">.</span><span class="n">kneighbors</span><span class="p">(</span><span class="n">ds1</span><span class="p">,</span> <span class="n">return_distance</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">match</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">ds1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">ind</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">b_i</span> <span class="ow">in</span> <span class="n">b</span><span class="p">:</span>
+            <span class="k">match</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">names1</span><span class="p">[</span><span class="n">a</span><span class="p">],</span> <span class="n">names2</span><span class="p">[</span><span class="n">b_i</span><span class="p">]))</span>
+
+    <span class="k">return</span> <span class="n">match</span></div>
+
+<div class="viewcode-block" id="nn_annoy"><a class="viewcode-back" href="../../api/spamosaic.MNN.nn_annoy.html#spamosaic.MNN.nn_annoy">[docs]</a><span class="k">def</span> <span class="nf">nn_annoy</span><span class="p">(</span><span class="n">ds1</span><span class="p">,</span> <span class="n">ds2</span><span class="p">,</span> <span class="n">names1</span><span class="p">,</span> <span class="n">names2</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">knn</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;euclidean&#39;</span><span class="p">,</span> <span class="n">n_trees</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">save_on_disk</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Approximate nearest neighbor search using Annoy index.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ds1 : np.ndarray</span>
+<span class="sd">        Query dataset.</span>
+<span class="sd">    ds2 : np.ndarray</span>
+<span class="sd">        Reference dataset.</span>
+<span class="sd">    names1 : list of str</span>
+<span class="sd">        Identifiers for `ds1`.</span>
+<span class="sd">    names2 : list of str</span>
+<span class="sd">        Identifiers for `ds2`.</span>
+<span class="sd">    norm : bool, default=True</span>
+<span class="sd">        Whether to L2 normalize datasets before indexing.</span>
+<span class="sd">    knn : int</span>
+<span class="sd">        Number of nearest neighbors to retrieve.</span>
+<span class="sd">    metric : str, default=&#39;euclidean&#39;</span>
+<span class="sd">        Distance metric (&#39;euclidean&#39;, &#39;manhattan&#39;, etc.).</span>
+<span class="sd">    n_trees : int, default=10</span>
+<span class="sd">        Number of trees to build in Annoy index.</span>
+<span class="sd">    save_on_disk : bool, default=False</span>
+<span class="sd">        Whether to write index to disk.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Set[Tuple[str, str]]</span>
+<span class="sd">        Set of nearest neighbor pairs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">norm</span><span class="p">:</span>
+        <span class="n">ds1</span> <span class="o">=</span> <span class="n">normalize</span><span class="p">(</span><span class="n">ds1</span><span class="p">)</span>
+        <span class="n">ds2</span> <span class="o">=</span> <span class="n">normalize</span><span class="p">(</span><span class="n">ds2</span><span class="p">)</span> 
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Assumes that Y is zero-indexed. &quot;&quot;&quot;</span>
+    <span class="c1"># Build index.</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">AnnoyIndex</span><span class="p">(</span><span class="n">ds2</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">save_on_disk</span><span class="p">):</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">on_disk_build</span><span class="p">(</span><span class="s1">&#39;annoy.index&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ds2</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="n">a</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">ds2</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:])</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">n_trees</span><span class="p">)</span>
+
+    <span class="c1"># Search index.</span>
+    <span class="n">ind</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ds1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="n">ind</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">get_nns_by_vector</span><span class="p">(</span><span class="n">ds1</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:],</span> <span class="n">knn</span><span class="p">,</span> <span class="n">search_k</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">ind</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ind</span><span class="p">)</span>
+
+    <span class="c1"># Match.</span>
+    <span class="n">match</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">ds1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">ind</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">b_i</span> <span class="ow">in</span> <span class="n">b</span><span class="p">:</span>
+            <span class="k">match</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">names1</span><span class="p">[</span><span class="n">a</span><span class="p">],</span> <span class="n">names2</span><span class="p">[</span><span class="n">b_i</span><span class="p">]))</span>
+
+    <span class="k">return</span> <span class="n">match</span></div>
+
+
+<div class="viewcode-block" id="mnn"><a class="viewcode-back" href="../../api/spamosaic.MNN.mnn.html#spamosaic.MNN.mnn">[docs]</a><span class="k">def</span> <span class="nf">mnn</span><span class="p">(</span><span class="n">ds1</span><span class="p">,</span> <span class="n">ds2</span><span class="p">,</span> <span class="n">names1</span><span class="p">,</span> <span class="n">names2</span><span class="p">,</span> <span class="n">knn1</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">knn2</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+        <span class="n">approx</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;euclidean&#39;</span><span class="p">,</span> <span class="n">way</span><span class="o">=</span><span class="s1">&#39;hnsw&#39;</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute Mutual Nearest Neighbors (MNN) between two datasets.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ds1 : np.ndarray</span>
+<span class="sd">        First dataset (queries).</span>
+<span class="sd">    ds2 : np.ndarray</span>
+<span class="sd">        Second dataset (references).</span>
+<span class="sd">    names1 : list of str</span>
+<span class="sd">        Identifiers for `ds1`.</span>
+<span class="sd">    names2 : list of str</span>
+<span class="sd">        Identifiers for `ds2`.</span>
+<span class="sd">    knn1 : int</span>
+<span class="sd">        Number of neighbors for `ds1` → `ds2`.</span>
+<span class="sd">    knn2 : int</span>
+<span class="sd">        Number of neighbors for `ds2` → `ds1`.</span>
+<span class="sd">    approx : bool, default=True</span>
+<span class="sd">        Whether to use approximate neighbor search.</span>
+<span class="sd">    metric : str, default=&#39;euclidean&#39;</span>
+<span class="sd">        Distance metric to use.</span>
+<span class="sd">    way : str, default=&#39;hnsw&#39;</span>
+<span class="sd">        Method for approximate search: &#39;hnsw&#39; or &#39;annoy&#39;.</span>
+<span class="sd">    norm : bool, default=False</span>
+<span class="sd">        Whether to normalize data before Annoy search.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Set[Tuple[str, str]]</span>
+<span class="sd">        Set of mutual nearest neighbor pairs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">if</span> <span class="n">approx</span><span class="p">:</span> 
+        <span class="k">if</span> <span class="n">way</span><span class="o">==</span><span class="s1">&#39;hnsw&#39;</span><span class="p">:</span>
+            <span class="c1"># Find nearest neighbors in first direction.</span>
+            <span class="c1"># output KNN point for each point in ds1.  match1 is a set(): (points in names1, points in names2), the size of the set is ds1.shape[0]*knn</span>
+            <span class="n">match1</span> <span class="o">=</span> <span class="n">nn_approx</span><span class="p">(</span><span class="n">ds1</span><span class="p">,</span> <span class="n">ds2</span><span class="p">,</span> <span class="n">names1</span><span class="p">,</span> <span class="n">names2</span><span class="p">,</span> <span class="n">knn</span><span class="o">=</span><span class="n">knn1</span><span class="p">)</span>
+            <span class="c1"># Find nearest neighbors in second direction.</span>
+            <span class="n">match2</span> <span class="o">=</span> <span class="n">nn_approx</span><span class="p">(</span><span class="n">ds2</span><span class="p">,</span> <span class="n">ds1</span><span class="p">,</span> <span class="n">names2</span><span class="p">,</span> <span class="n">names1</span><span class="p">,</span> <span class="n">knn</span><span class="o">=</span><span class="n">knn2</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">match1</span> <span class="o">=</span> <span class="n">nn_annoy</span><span class="p">(</span><span class="n">ds1</span><span class="p">,</span> <span class="n">ds2</span><span class="p">,</span> <span class="n">names1</span><span class="p">,</span> <span class="n">names2</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span> <span class="n">knn</span><span class="o">=</span><span class="n">knn1</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">)</span>
+            <span class="n">match2</span> <span class="o">=</span> <span class="n">nn_annoy</span><span class="p">(</span><span class="n">ds2</span><span class="p">,</span> <span class="n">ds1</span><span class="p">,</span> <span class="n">names2</span><span class="p">,</span> <span class="n">names1</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="n">norm</span><span class="p">,</span> <span class="n">knn</span><span class="o">=</span><span class="n">knn2</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">match1</span> <span class="o">=</span> <span class="n">nn</span><span class="p">(</span><span class="n">ds1</span><span class="p">,</span> <span class="n">ds2</span><span class="p">,</span> <span class="n">names1</span><span class="p">,</span> <span class="n">names2</span><span class="p">,</span> <span class="n">knn</span><span class="o">=</span><span class="n">knn1</span><span class="p">)</span>
+        <span class="n">match2</span> <span class="o">=</span> <span class="n">nn</span><span class="p">(</span><span class="n">ds2</span><span class="p">,</span> <span class="n">ds1</span><span class="p">,</span> <span class="n">names2</span><span class="p">,</span> <span class="n">names1</span><span class="p">,</span> <span class="n">knn</span><span class="o">=</span><span class="n">knn2</span><span class="p">)</span>
+    <span class="c1"># Compute mutual nearest neighbors.</span>
+    <span class="n">mutual</span> <span class="o">=</span> <span class="n">match1</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">([</span> <span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">match2</span> <span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">mutual</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

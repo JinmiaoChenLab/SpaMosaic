@@ -1,0 +1,458 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>spamosaic.utils &mdash; spamosaic v1.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=9af0dbfa" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=393fe109"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="spamosaic.utils.check_batch_empty" href="spamosaic.utils.check_batch_empty.html" />
+    <link rel="prev" title="spamosaic.train_utils.train_model" href="spamosaic.train_utils.train_model.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            spamosaic
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../spamosaic.html">API Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="spamosaic.build_graph.html">spamosaic.build_graph</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spamosaic.framework.html">spamosaic.framework</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spamosaic.loss.html">spamosaic.loss</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spamosaic.MNN.html">spamosaic.MNN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spamosaic.preprocessing.html">spamosaic.preprocessing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spamosaic.train_utils.html">spamosaic.train_utils</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">spamosaic.utils</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#spamosaic.utils.Config"><code class="docutils literal notranslate"><span class="pre">Config</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#spamosaic.utils.Config.__dict__"><code class="docutils literal notranslate"><span class="pre">Config.__dict__</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#spamosaic.utils.check_batch_empty"><code class="docutils literal notranslate"><span class="pre">check_batch_empty()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spamosaic.utils.clustering"><code class="docutils literal notranslate"><span class="pre">clustering()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spamosaic.utils.dict_map"><code class="docutils literal notranslate"><span class="pre">dict_map()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spamosaic.utils.flip_axis"><code class="docutils literal notranslate"><span class="pre">flip_axis()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spamosaic.utils.get_barc2batch"><code class="docutils literal notranslate"><span class="pre">get_barc2batch()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spamosaic.utils.get_umap"><code class="docutils literal notranslate"><span class="pre">get_umap()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spamosaic.utils.load_config"><code class="docutils literal notranslate"><span class="pre">load_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spamosaic.utils.mclust_R"><code class="docutils literal notranslate"><span class="pre">mclust_R()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spamosaic.utils.nn_approx"><code class="docutils literal notranslate"><span class="pre">nn_approx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spamosaic.utils.plot_basis"><code class="docutils literal notranslate"><span class="pre">plot_basis()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spamosaic.utils.reorder"><code class="docutils literal notranslate"><span class="pre">reorder()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spamosaic.utils.split_adata_ob"><code class="docutils literal notranslate"><span class="pre">split_adata_ob()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="spamosaic.utils.check_batch_empty.html">spamosaic.utils.check_batch_empty</a></li>
+<li class="toctree-l3"><a class="reference internal" href="spamosaic.utils.clustering.html">spamosaic.utils.clustering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="spamosaic.utils.dict_map.html">spamosaic.utils.dict_map</a></li>
+<li class="toctree-l3"><a class="reference internal" href="spamosaic.utils.flip_axis.html">spamosaic.utils.flip_axis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="spamosaic.utils.get_barc2batch.html">spamosaic.utils.get_barc2batch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="spamosaic.utils.get_umap.html">spamosaic.utils.get_umap</a></li>
+<li class="toctree-l3"><a class="reference internal" href="spamosaic.utils.load_config.html">spamosaic.utils.load_config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="spamosaic.utils.mclust_R.html">spamosaic.utils.mclust_R</a></li>
+<li class="toctree-l3"><a class="reference internal" href="spamosaic.utils.nn_approx.html">spamosaic.utils.nn_approx</a></li>
+<li class="toctree-l3"><a class="reference internal" href="spamosaic.utils.plot_basis.html">spamosaic.utils.plot_basis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="spamosaic.utils.reorder.html">spamosaic.utils.reorder</a></li>
+<li class="toctree-l3"><a class="reference internal" href="spamosaic.utils.split_adata_ob.html">spamosaic.utils.split_adata_ob</a></li>
+<li class="toctree-l3"><a class="reference internal" href="spamosaic.utils.Config.html">spamosaic.utils.Config</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="spamosaic.architectures.html">spamosaic.architectures</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../dataset.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../credits.html">Credits</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">spamosaic</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../spamosaic.html">API Documentation</a></li>
+      <li class="breadcrumb-item active">spamosaic.utils</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/spamosaic.utils.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-spamosaic.utils">
+<span id="spamosaic-utils"></span><h1>spamosaic.utils<a class="headerlink" href="#module-spamosaic.utils" title="Permalink to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="spamosaic.utils.Config">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spamosaic.utils.</span></span><span class="sig-name descname"><span class="pre">Config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dictionary</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spamosaic/utils.html#Config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spamosaic.utils.Config" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A wrapper class that recursively converts a dictionary to an object with attribute-style access.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="spamosaic.utils.Config.__dict__">
+<span class="sig-name descname"><span class="pre">__dict__</span></span><a class="headerlink" href="#spamosaic.utils.Config.__dict__" title="Permalink to this definition"></a></dt>
+<dd><p>Stores the nested configuration structure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spamosaic.utils.check_batch_empty">
+<span class="sig-prename descclassname"><span class="pre">spamosaic.utils.</span></span><span class="sig-name descname"><span class="pre">check_batch_empty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modBatch_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spamosaic/utils.html#check_batch_empty"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spamosaic.utils.check_batch_empty" title="Permalink to this definition"></a></dt>
+<dd><p>Checks if any batch in the modality-batch dictionary is empty and returns indices of modalities per batch.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>modBatch_dict</strong> (<em>dict</em>) – Dictionary of modality -&gt; list of AnnData objects (or None).</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – Whether to print out batch composition.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of lists indicating indices of modalities present in each batch.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[list[int]]</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If any batch is completely empty.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spamosaic.utils.clustering">
+<span class="sig-prename descclassname"><span class="pre">spamosaic.utils.</span></span><span class="sig-name descname"><span class="pre">clustering</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_cluster</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">used_obsm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'kmeans'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'tmp_clust'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spamosaic/utils.html#clustering"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spamosaic.utils.clustering" title="Permalink to this definition"></a></dt>
+<dd><p>Performs clustering on an AnnData object using k-means or Mclust.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adata</strong> (<em>AnnData</em>) – Input data.</p></li>
+<li><p><strong>n_cluster</strong> (<em>int</em>) – Number of clusters.</p></li>
+<li><p><strong>used_obsm</strong> (<em>str</em>) – Key in <cite>.obsm</cite> to use for clustering.</p></li>
+<li><p><strong>algo</strong> (<em>str</em>) – Clustering algorithm, ‘kmeans’ or ‘mclust’.</p></li>
+<li><p><strong>key</strong> (<em>str</em>) – Key name to store clustering results in <cite>.obs</cite>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Annotated object with cluster assignments.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>AnnData</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spamosaic.utils.dict_map">
+<span class="sig-prename descclassname"><span class="pre">spamosaic.utils.</span></span><span class="sig-name descname"><span class="pre">dict_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spamosaic/utils.html#dict_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spamosaic.utils.dict_map" title="Permalink to this definition"></a></dt>
+<dd><p>Applies dictionary mapping over a list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>_dict</strong> (<em>dict</em>) – Dictionary to map from.</p></li>
+<li><p><strong>_list</strong> (<em>list</em>) – List of keys.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Mapped values.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spamosaic.utils.flip_axis">
+<span class="sig-prename descclassname"><span class="pre">spamosaic.utils.</span></span><span class="sig-name descname"><span class="pre">flip_axis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ads</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spamosaic/utils.html#flip_axis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spamosaic.utils.flip_axis" title="Permalink to this definition"></a></dt>
+<dd><p>Flips the spatial coordinates of AnnData objects along a specified axis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ads</strong> (<em>list</em><em>[</em><em>AnnData</em><em>]</em>) – List of data objects to modify.</p></li>
+<li><p><strong>axis</strong> (<em>int</em>) – Axis to flip (0 for x, 1 for y).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spamosaic.utils.get_barc2batch">
+<span class="sig-prename descclassname"><span class="pre">spamosaic.utils.</span></span><span class="sig-name descname"><span class="pre">get_barc2batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modBatch_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spamosaic/utils.html#get_barc2batch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spamosaic.utils.get_barc2batch" title="Permalink to this definition"></a></dt>
+<dd><p>Creates a mapping from cell barcodes to their batch indices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>modBatch_dict</strong> (<em>dict</em>) – Dictionary of modality -&gt; list of AnnData objects.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Mapping from barcode to batch index.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spamosaic.utils.get_umap">
+<span class="sig-prename descclassname"><span class="pre">spamosaic.utils.</span></span><span class="sig-name descname"><span class="pre">get_umap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_reps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spamosaic/utils.html#get_umap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spamosaic.utils.get_umap" title="Permalink to this definition"></a></dt>
+<dd><p>Computes UMAP embeddings for given representation keys and stores them in <cite>.obsm</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ad</strong> (<em>AnnData</em>) – Input data.</p></li>
+<li><p><strong>use_reps</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) – Keys in <cite>.obsm</cite> to compute UMAP for.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Annotated object with new UMAPs.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>AnnData</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spamosaic.utils.load_config">
+<span class="sig-prename descclassname"><span class="pre">spamosaic.utils.</span></span><span class="sig-name descname"><span class="pre">load_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spamosaic/utils.html#load_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spamosaic.utils.load_config" title="Permalink to this definition"></a></dt>
+<dd><p>Loads a YAML configuration file into a Config object.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filepath</strong> (<em>str</em>) – Path to the YAML configuration file.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Parsed configuration object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="spamosaic.utils.Config.html#spamosaic.utils.Config" title="spamosaic.utils.Config">Config</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spamosaic.utils.mclust_R">
+<span class="sig-prename descclassname"><span class="pre">spamosaic.utils.</span></span><span class="sig-name descname"><span class="pre">mclust_R</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_cluster</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modelNames</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'EEE'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">used_obsm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'emb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2020</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spamosaic/utils.html#mclust_R"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spamosaic.utils.mclust_R" title="Permalink to this definition"></a></dt>
+<dd><p>Performs R’s Mclust via rpy2.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adata</strong> (<em>AnnData</em>) – AnnData object with embedding stored in <cite>.obsm</cite>.</p></li>
+<li><p><strong>num_cluster</strong> (<em>int</em>) – Desired number of clusters.</p></li>
+<li><p><strong>modelNames</strong> (<em>str</em>) – Covariance structure model in Mclust.</p></li>
+<li><p><strong>used_obsm</strong> (<em>str</em>) – Key in <cite>.obsm</cite> to use for clustering.</p></li>
+<li><p><strong>random_seed</strong> (<em>int</em>) – Random seed for reproducibility.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Annotated object with added <cite>mclust</cite> cluster label.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>AnnData</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spamosaic.utils.nn_approx">
+<span class="sig-prename descclassname"><span class="pre">spamosaic.utils.</span></span><span class="sig-name descname"><span class="pre">nn_approx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ds2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">knn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'manhattan'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_trees</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_distances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spamosaic/utils.html#nn_approx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spamosaic.utils.nn_approx" title="Permalink to this definition"></a></dt>
+<dd><p>Performs approximate nearest neighbor search using Annoy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds1</strong> (<em>np.ndarray</em>) – Query data (n_samples, n_features).</p></li>
+<li><p><strong>ds2</strong> (<em>np.ndarray</em>) – Reference data (n_samples, n_features).</p></li>
+<li><p><strong>norm</strong> (<em>bool</em>) – Whether to normalize data before search.</p></li>
+<li><p><strong>knn</strong> (<em>int</em>) – Number of nearest neighbors to retrieve.</p></li>
+<li><p><strong>metric</strong> (<em>str</em>) – Distance metric for Annoy (e.g., ‘manhattan’).</p></li>
+<li><p><strong>n_trees</strong> (<em>int</em>) – Number of trees used by Annoy.</p></li>
+<li><p><strong>include_distances</strong> (<em>bool</em>) – Whether to return distances with indices.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Indices of nearest neighbors, optionally with distances.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray or tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spamosaic.utils.plot_basis">
+<span class="sig-prename descclassname"><span class="pre">spamosaic.utils.</span></span><span class="sig-name descname"><span class="pre">plot_basis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spamosaic/utils.html#plot_basis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spamosaic.utils.plot_basis" title="Permalink to this definition"></a></dt>
+<dd><p>Wrapper for Scanpy’s <cite>sc.pl.embedding</cite> with warning suppression.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ad</strong> (<em>AnnData</em>) – Annotated data object.</p></li>
+<li><p><strong>basis</strong> (<em>str</em>) – Key of embedding (e.g., ‘umap’).</p></li>
+<li><p><strong>color</strong> (<em>str</em>) – Variable in <cite>.obs</cite> to color by.</p></li>
+<li><p><strong>**kwargs</strong> – Additional plotting arguments.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spamosaic.utils.reorder">
+<span class="sig-prename descclassname"><span class="pre">spamosaic.utils.</span></span><span class="sig-name descname"><span class="pre">reorder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ad1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ad2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spamosaic/utils.html#reorder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spamosaic.utils.reorder" title="Permalink to this definition"></a></dt>
+<dd><p>Aligns and reorders two AnnData objects to only shared barcodes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ad1</strong> (<em>AnnData</em>) – First data object.</p></li>
+<li><p><strong>ad2</strong> (<em>AnnData</em>) – Second data object.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Reordered and aligned data objects.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[AnnData, AnnData]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="spamosaic.utils.split_adata_ob">
+<span class="sig-prename descclassname"><span class="pre">spamosaic.utils.</span></span><span class="sig-name descname"><span class="pre">split_adata_ob</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ads</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ad_ref</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ob</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'obs'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'emb'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spamosaic/utils.html#split_adata_ob"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spamosaic.utils.split_adata_ob" title="Permalink to this definition"></a></dt>
+<dd><p>Splits a reference AnnData object’s observations or embeddings into a list of AnnData objects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ads</strong> (<em>list</em><em>[</em><em>AnnData</em><em>]</em>) – List of target AnnData objects.</p></li>
+<li><p><strong>ad_ref</strong> (<em>AnnData</em>) – Source AnnData object containing merged info.</p></li>
+<li><p><strong>ob</strong> (<em>str</em>) – Whether to split ‘obs’ or ‘obsm’.</p></li>
+<li><p><strong>key</strong> (<em>str</em>) – Key to split in <cite>.obs</cite> or <cite>.obsm</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="spamosaic.utils.check_batch_empty.html#spamosaic.utils.check_batch_empty" title="spamosaic.utils.check_batch_empty"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_batch_empty</span></code></a></p></td>
+<td><p>Checks if any batch in the modality-batch dictionary is empty and returns indices of modalities per batch.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="spamosaic.utils.clustering.html#spamosaic.utils.clustering" title="spamosaic.utils.clustering"><code class="xref py py-obj docutils literal notranslate"><span class="pre">clustering</span></code></a></p></td>
+<td><p>Performs clustering on an AnnData object using k-means or Mclust.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="spamosaic.utils.dict_map.html#spamosaic.utils.dict_map" title="spamosaic.utils.dict_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict_map</span></code></a></p></td>
+<td><p>Applies dictionary mapping over a list.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="spamosaic.utils.flip_axis.html#spamosaic.utils.flip_axis" title="spamosaic.utils.flip_axis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flip_axis</span></code></a></p></td>
+<td><p>Flips the spatial coordinates of AnnData objects along a specified axis.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="spamosaic.utils.get_barc2batch.html#spamosaic.utils.get_barc2batch" title="spamosaic.utils.get_barc2batch"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_barc2batch</span></code></a></p></td>
+<td><p>Creates a mapping from cell barcodes to their batch indices.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="spamosaic.utils.get_umap.html#spamosaic.utils.get_umap" title="spamosaic.utils.get_umap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_umap</span></code></a></p></td>
+<td><p>Computes UMAP embeddings for given representation keys and stores them in <cite>.obsm</cite>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="spamosaic.utils.load_config.html#spamosaic.utils.load_config" title="spamosaic.utils.load_config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_config</span></code></a></p></td>
+<td><p>Loads a YAML configuration file into a Config object.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="spamosaic.utils.mclust_R.html#spamosaic.utils.mclust_R" title="spamosaic.utils.mclust_R"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mclust_R</span></code></a></p></td>
+<td><p>Performs R's Mclust via rpy2.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="spamosaic.utils.nn_approx.html#spamosaic.utils.nn_approx" title="spamosaic.utils.nn_approx"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nn_approx</span></code></a></p></td>
+<td><p>Performs approximate nearest neighbor search using Annoy.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="spamosaic.utils.plot_basis.html#spamosaic.utils.plot_basis" title="spamosaic.utils.plot_basis"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_basis</span></code></a></p></td>
+<td><p>Wrapper for Scanpy's <cite>sc.pl.embedding</cite> with warning suppression.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="spamosaic.utils.reorder.html#spamosaic.utils.reorder" title="spamosaic.utils.reorder"><code class="xref py py-obj docutils literal notranslate"><span class="pre">reorder</span></code></a></p></td>
+<td><p>Aligns and reorders two AnnData objects to only shared barcodes.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="spamosaic.utils.split_adata_ob.html#spamosaic.utils.split_adata_ob" title="spamosaic.utils.split_adata_ob"><code class="xref py py-obj docutils literal notranslate"><span class="pre">split_adata_ob</span></code></a></p></td>
+<td><p>Splits a reference AnnData object's observations or embeddings into a list of AnnData objects.</p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Classes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="spamosaic.utils.Config.html#spamosaic.utils.Config" title="spamosaic.utils.Config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Config</span></code></a></p></td>
+<td><p>A wrapper class that recursively converts a dictionary to an object with attribute-style access.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="spamosaic.train_utils.train_model.html" class="btn btn-neutral float-left" title="spamosaic.train_utils.train_model" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="spamosaic.utils.check_batch_empty.html" class="btn btn-neutral float-right" title="spamosaic.utils.check_batch_empty" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

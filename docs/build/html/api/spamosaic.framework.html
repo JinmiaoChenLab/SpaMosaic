@@ -1,0 +1,319 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>spamosaic.framework &mdash; spamosaic v1.0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=9af0dbfa" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=393fe109"></script>
+      <script src="../_static/doctools.js?v=888ff710"></script>
+      <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="spamosaic.framework.SpaMosaic" href="spamosaic.framework.SpaMosaic.html" />
+    <link rel="prev" title="spamosaic.build_graph.remove_outlier" href="spamosaic.build_graph.remove_outlier.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            spamosaic
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../spamosaic.html">API Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="spamosaic.build_graph.html">spamosaic.build_graph</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">spamosaic.framework</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#spamosaic.framework.SpaMosaic"><code class="docutils literal notranslate"><span class="pre">SpaMosaic</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#spamosaic.framework.SpaMosaic.apply_smoothing"><code class="docutils literal notranslate"><span class="pre">SpaMosaic.apply_smoothing()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#spamosaic.framework.SpaMosaic.check_integrity"><code class="docutils literal notranslate"><span class="pre">SpaMosaic.check_integrity()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#spamosaic.framework.SpaMosaic.impute"><code class="docutils literal notranslate"><span class="pre">SpaMosaic.impute()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#spamosaic.framework.SpaMosaic.infer_emb"><code class="docutils literal notranslate"><span class="pre">SpaMosaic.infer_emb()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#spamosaic.framework.SpaMosaic.prepare_inputs"><code class="docutils literal notranslate"><span class="pre">SpaMosaic.prepare_inputs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#spamosaic.framework.SpaMosaic.prepare_inter_graphs"><code class="docutils literal notranslate"><span class="pre">SpaMosaic.prepare_inter_graphs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#spamosaic.framework.SpaMosaic.prepare_intra_graphs"><code class="docutils literal notranslate"><span class="pre">SpaMosaic.prepare_intra_graphs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#spamosaic.framework.SpaMosaic.prepare_net"><code class="docutils literal notranslate"><span class="pre">SpaMosaic.prepare_net()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#spamosaic.framework.SpaMosaic.train"><code class="docutils literal notranslate"><span class="pre">SpaMosaic.train()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="spamosaic.framework.SpaMosaic.html">spamosaic.framework.SpaMosaic</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="spamosaic.loss.html">spamosaic.loss</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spamosaic.MNN.html">spamosaic.MNN</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spamosaic.preprocessing.html">spamosaic.preprocessing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spamosaic.train_utils.html">spamosaic.train_utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spamosaic.utils.html">spamosaic.utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spamosaic.architectures.html">spamosaic.architectures</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../dataset.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../credits.html">Credits</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">spamosaic</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../spamosaic.html">API Documentation</a></li>
+      <li class="breadcrumb-item active">spamosaic.framework</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/spamosaic.framework.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-spamosaic.framework">
+<span id="spamosaic-framework"></span><h1>spamosaic.framework<a class="headerlink" href="#module-spamosaic.framework" title="Permalink to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="spamosaic.framework.SpaMosaic">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">spamosaic.framework.</span></span><span class="sig-name descname"><span class="pre">SpaMosaic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modBatch_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'dimred_bc'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mnn_rep_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'batch'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius_cutoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intra_knns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inter_knn_base</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smooth_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smooth_L</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inter_auto_knn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inter_auto_thr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rmv_outlier</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contamination</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'auto'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1234</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cuda:0'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spamosaic/framework.html#SpaMosaic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spamosaic.framework.SpaMosaic" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>SpaMosaic: A modular framework for multi-modal spatial omics integration.</p>
+<p>This class manages data pre-processing, intra- and inter-batch graph construction,
+model initialization and training, feature alignment, and imputation across multiple
+omics modalities (e.g., RNA, ADT, ATAC) in spatial transcriptomics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>modBatch_dict</strong> (<em>dict</em>) – Dictionary mapping modality name (e.g., ‘rna’, ‘adt’) to a list of AnnData objects (batches).</p></li>
+<li><p><strong>input_key</strong> (<em>str</em>) – Key in <cite>obsm</cite> where input features are stored (e.g., ‘dimred_bc’).</p></li>
+<li><p><strong>mnn_rep_key</strong> (<em>str</em><em>, </em><em>optional</em>) – Key for representation used in MNN search. If None, defaults to <cite>input_key</cite>.</p></li>
+<li><p><strong>batch_key</strong> (<em>str</em>) – Column name in <cite>obs</cite> denoting batch identity.</p></li>
+<li><p><strong>radius_cutoff</strong> (<em>int</em>) – Radius threshold to construct spatial neighbor graph.</p></li>
+<li><p><strong>intra_knns</strong> (<em>int</em><em> or </em><em>list</em><em> of </em><em>int</em>) – Number of neighbors in intra-batch graph (can be int or per-batch list).</p></li>
+<li><p><strong>inter_knn_base</strong> (<em>int</em>) – Base KNN size for inter-batch MNN search.</p></li>
+<li><p><strong>smooth_input</strong> (<em>bool</em>) – Whether to apply GCN-based input feature smoothing.</p></li>
+<li><p><strong>smooth_L</strong> (<em>int</em>) – Number of GCN layers used in smoothing.</p></li>
+<li><p><strong>inter_auto_knn</strong> (<em>bool</em>) – Whether to adapt KNN size based on batch size ratio.</p></li>
+<li><p><strong>inter_auto_thr</strong> (<em>float</em>) – Size ratio threshold to apply adaptive KNN.</p></li>
+<li><p><strong>rmv_outlier</strong> (<em>bool</em>) – Whether to remove outlier MNN pairs.</p></li>
+<li><p><strong>contamination</strong> (<em>str</em><em> or </em><em>float</em>) – Contamination level for outlier detection (used in IsolationForest).</p></li>
+<li><p><strong>w_g</strong> (<em>float</em>) – Weight for inter-batch expression edges in the merged graph.</p></li>
+<li><p><strong>log_dir</strong> (<em>str</em><em>, </em><em>optional</em>) – Directory for saving logs or results.</p></li>
+<li><p><strong>seed</strong> (<em>int</em>) – Random seed.</p></li>
+<li><p><strong>num_workers</strong> (<em>int</em>) – Number of workers used for computation.</p></li>
+<li><p><strong>device</strong> (<em>str</em>) – Device to use, e.g., ‘cuda:0’ or ‘cpu’.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="spamosaic.framework.SpaMosaic.apply_smoothing">
+<span class="sig-name descname"><span class="pre">apply_smoothing</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modBatch_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spamosaic/framework.html#SpaMosaic.apply_smoothing"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spamosaic.framework.SpaMosaic.apply_smoothing" title="Permalink to this definition"></a></dt>
+<dd><p>Apply feature smoothing using LGCN on intra-batch graphs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>modBatch_dict</strong> (<em>dict</em>) – Dictionary mapping modality to list of AnnData objects.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spamosaic.framework.SpaMosaic.check_integrity">
+<span class="sig-name descname"><span class="pre">check_integrity</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spamosaic/framework.html#SpaMosaic.check_integrity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spamosaic.framework.SpaMosaic.check_integrity" title="Permalink to this definition"></a></dt>
+<dd><p>Check if all modalities across batches form a connected integration graph.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>RuntimeError</strong> – If the graph of shared modalities across batches is not fully connected.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spamosaic.framework.SpaMosaic.impute">
+<span class="sig-name descname"><span class="pre">impute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modBatch_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">emb_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'emb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layer_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'counts'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imp_knn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spamosaic/framework.html#SpaMosaic.impute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spamosaic.framework.SpaMosaic.impute" title="Permalink to this definition"></a></dt>
+<dd><p>Impute missing modalities using aligned embedding space and KNN.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>modBatch_dict</strong> (<em>dict</em>) – Input dictionary of modalities and batches.</p></li>
+<li><p><strong>emb_key</strong> (<em>str</em>) – Key where latent embeddings are stored.</p></li>
+<li><p><strong>layer_key</strong> (<em>str</em>) – Which layer to impute (e.g., ‘counts’).</p></li>
+<li><p><strong>imp_knn</strong> (<em>int</em>) – Number of neighbors to use in KNN-based imputation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>dict</em></p></li>
+<li><p><strong>Imputed data dictionary</strong> (<em>{modality -&gt; list of arrays (or None)}.</em>)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spamosaic.framework.SpaMosaic.infer_emb">
+<span class="sig-name descname"><span class="pre">infer_emb</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modBatch_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">emb_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'emb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_latent_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'merged_emb'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spamosaic/framework.html#SpaMosaic.infer_emb"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spamosaic.framework.SpaMosaic.infer_emb" title="Permalink to this definition"></a></dt>
+<dd><p>Infer latent embeddings for each cell and return merged AnnData list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>modBatch_dict</strong> (<em>dict</em>) – Original input dictionary of modalities and batches.</p></li>
+<li><p><strong>emb_key</strong> (<em>str</em>) – Key to store intermediate embeddings.</p></li>
+<li><p><strong>final_latent_key</strong> (<em>str</em>) – Key to store final merged embedding in returned AnnData.</p></li>
+<li><p><strong>cat</strong> (<em>bool</em>) – Whether to concatenate (True) or average (False) modalities.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Reconstructed AnnData objects with merged embeddings.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of AnnData</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spamosaic.framework.SpaMosaic.prepare_inputs">
+<span class="sig-name descname"><span class="pre">prepare_inputs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modBatch_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spamosaic/framework.html#SpaMosaic.prepare_inputs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spamosaic.framework.SpaMosaic.prepare_inputs" title="Permalink to this definition"></a></dt>
+<dd><p>Merge AnnData objects and construct final PyTorch graph inputs.</p>
+<p>Includes:
+- Concatenating features and adjacency matrices.
+- Adding intra- and inter-batch edges.
+- Computing edge types (same-batch or cross-batch).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spamosaic.framework.SpaMosaic.prepare_inter_graphs">
+<span class="sig-name descname"><span class="pre">prepare_inter_graphs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modBatch_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spamosaic/framework.html#SpaMosaic.prepare_inter_graphs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spamosaic.framework.SpaMosaic.prepare_inter_graphs" title="Permalink to this definition"></a></dt>
+<dd><p>Build mutual nearest neighbor (MNN) graphs between batches for each modality.</p>
+<p>This includes:
+- Identifying bridge and non-bridge batches.
+- Computing MNN pairs within each modality.
+- Optionally filtering outliers.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spamosaic.framework.SpaMosaic.prepare_intra_graphs">
+<span class="sig-name descname"><span class="pre">prepare_intra_graphs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modBatch_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spamosaic/framework.html#SpaMosaic.prepare_intra_graphs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spamosaic.framework.SpaMosaic.prepare_intra_graphs" title="Permalink to this definition"></a></dt>
+<dd><p>Build spatial neighbor graphs for each modality across batches.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>modBatch_dict</strong> (<em>dict</em>) – Dictionary mapping modality to list of AnnData objects.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spamosaic.framework.SpaMosaic.prepare_net">
+<span class="sig-name descname"><span class="pre">prepare_net</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">net</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spamosaic/framework.html#SpaMosaic.prepare_net"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spamosaic.framework.SpaMosaic.prepare_net" title="Permalink to this definition"></a></dt>
+<dd><p>Instantiate the architecture for each modality based on config.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>net</strong> (<em>str</em>) – Name of model architecture (must match a config YAML file).</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Mapping from modality name to initialized PyTorch model.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="spamosaic.framework.SpaMosaic.train">
+<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">net</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_mini_thr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mini_batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1024</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'adapted'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bias</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_epochs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_rec_g</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/spamosaic/framework.html#SpaMosaic.train"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#spamosaic.framework.SpaMosaic.train" title="Permalink to this definition"></a></dt>
+<dd><p>Train the SpaMosaic model using contrastive and reconstruction losses.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>net</strong> (<em>str</em>) – Architecture name.</p></li>
+<li><p><strong>lr</strong> (<em>float</em>) – Learning rate.</p></li>
+<li><p><strong>use_mini_thr</strong> (<em>int</em>) – Threshold above which mini-batch training is used.</p></li>
+<li><p><strong>mini_batch_size</strong> (<em>int</em>) – Size of mini-batches if needed.</p></li>
+<li><p><strong>loss_type</strong> (<em>str</em>) – Type of loss (‘adapted’ or ‘ce’).</p></li>
+<li><p><strong>T</strong> (<em>float</em>) – Temperature for contrastive loss.</p></li>
+<li><p><strong>bias</strong> (<em>float</em>) – Bias term in adapted contrastive loss.</p></li>
+<li><p><strong>n_epochs</strong> (<em>int</em>) – Number of training epochs.</p></li>
+<li><p><strong>w_rec_g</strong> (<em>float</em>) – Weight for reconstruction loss.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<p class="rubric">Classes</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="spamosaic.framework.SpaMosaic.html#spamosaic.framework.SpaMosaic" title="spamosaic.framework.SpaMosaic"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SpaMosaic</span></code></a></p></td>
+<td><p>SpaMosaic: A modular framework for multi-modal spatial omics integration.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="spamosaic.build_graph.remove_outlier.html" class="btn btn-neutral float-left" title="spamosaic.build_graph.remove_outlier" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="spamosaic.framework.SpaMosaic.html" class="btn btn-neutral float-right" title="spamosaic.framework.SpaMosaic" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright .</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

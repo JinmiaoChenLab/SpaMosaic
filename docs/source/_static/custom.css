@@ -1,0 +1,26 @@
+/* 让 Integration 网格整体居中（兼容 RTD/Furo 包裹器） */
+div.tutorial-grid .wy-table-responsive,
+div.tutorial-grid .table-wrapper,
+div.tutorial-grid table.docutils {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* 单元格里的文字、链接居中显示 */
+div.tutorial-grid table.docutils td,
+div.tutorial-grid table.docutils th {
+  text-align: center;
+  vertical-align: top;
+}
+
+/* 图片在某些主题里即便 :align: center 也可能偏左，强制居中 */
+div.tutorial-grid img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* 让链接段落跟图片之间留一点空间 */
+div.tutorial-grid table.docutils td p {
+  margin: .5rem 0 0;
+}
