@@ -24,9 +24,9 @@
    :nosignatures:
 
 
-   HG_LGCN
-   HG_LGCN_Conv
-   HG_LGCN_vanilla
+   spamosaic.architectures.hg_lgcn.HG_LGCN
+   spamosaic.architectures.hg_lgcn.HG_LGCN_Conv
+   spamosaic.architectures.hg_lgcn.HG_LGCN_vanilla
 
 
 

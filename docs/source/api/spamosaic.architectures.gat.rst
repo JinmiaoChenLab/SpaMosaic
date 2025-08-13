@@ -24,8 +24,8 @@
    :nosignatures:
 
 
-   GAT
-   GATConv
+   spamosaic.architectures.gat.GAT
+   spamosaic.architectures.gat.GATConv
 
 
 

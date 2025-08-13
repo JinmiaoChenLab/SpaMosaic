@@ -19,18 +19,18 @@
    :nosignatures:
 
 
-   check_batch_empty
-   clustering
-   dict_map
-   flip_axis
-   get_barc2batch
-   get_umap
-   load_config
-   mclust_R
-   nn_approx
-   plot_basis
-   reorder
-   split_adata_ob
+   spamosaic.utils.check_batch_empty
+   spamosaic.utils.clustering
+   spamosaic.utils.dict_map
+   spamosaic.utils.flip_axis
+   spamosaic.utils.get_barc2batch
+   spamosaic.utils.get_umap
+   spamosaic.utils.load_config
+   spamosaic.utils.mclust_R
+   spamosaic.utils.nn_approx
+   spamosaic.utils.plot_basis
+   spamosaic.utils.reorder
+   spamosaic.utils.split_adata_ob
 
 
 
@@ -44,7 +44,7 @@
    :nosignatures:
 
 
-   Config
+   spamosaic.utils.Config
 
 
 

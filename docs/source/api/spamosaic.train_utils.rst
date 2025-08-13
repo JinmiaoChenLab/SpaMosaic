@@ -19,10 +19,10 @@
    :nosignatures:
 
 
-   graph_decode
-   graph_recon_crit
-   set_seeds
-   train_model
+   spamosaic.train_utils.graph_decode
+   spamosaic.train_utils.graph_recon_crit
+   spamosaic.train_utils.set_seeds
+   spamosaic.train_utils.train_model
 
 
 

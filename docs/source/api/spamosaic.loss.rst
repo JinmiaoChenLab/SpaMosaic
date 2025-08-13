@@ -19,7 +19,7 @@
    :nosignatures:
 
 
-   set_diag
+   spamosaic.loss.set_diag
 
 
 
@@ -33,7 +33,7 @@
    :nosignatures:
 
 
-   CL_loss
+   spamosaic.loss.CL_loss
 
 
 

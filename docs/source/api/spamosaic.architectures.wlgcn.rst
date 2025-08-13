@@ -19,7 +19,7 @@
    :nosignatures:
 
 
-   sym_norm
+   spamosaic.architectures.wlgcn.sym_norm
 
 
 
@@ -33,8 +33,8 @@
    :nosignatures:
 
 
-   WLGCN
-   WLGCN_vanilla
+   spamosaic.architectures.wlgcn.WLGCN
+   spamosaic.architectures.wlgcn.WLGCN_vanilla
 
 
 

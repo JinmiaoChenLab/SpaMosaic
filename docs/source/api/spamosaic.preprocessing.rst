@@ -19,12 +19,12 @@
    :nosignatures:
 
 
-   ADT_preprocess
-   Epigenome_preprocess
-   RNA_preprocess
-   clr_normalize
-   harmony
-   sparse_log1p_scale
+   spamosaic.preprocessing.ADT_preprocess
+   spamosaic.preprocessing.Epigenome_preprocess
+   spamosaic.preprocessing.RNA_preprocess
+   spamosaic.preprocessing.clr_normalize
+   spamosaic.preprocessing.harmony
+   spamosaic.preprocessing.sparse_log1p_scale
 
 
 
@@ -38,8 +38,8 @@
    :nosignatures:
 
 
-   lsiTransformer
-   tfidfTransformer
+   spamosaic.preprocessing.lsiTransformer
+   spamosaic.preprocessing.tfidfTransformer
 
 
 

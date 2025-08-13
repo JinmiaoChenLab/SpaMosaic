@@ -24,7 +24,7 @@
    :nosignatures:
 
 
-   HGT
+   spamosaic.architectures.hgt.HGT
 
 
 

@@ -24,7 +24,7 @@
    :nosignatures:
 
 
-   SpaMosaic
+   spamosaic.framework.SpaMosaic
 
 
 
