@@ -20,9 +20,9 @@ autodoc_mock_imports = [
     'torch.nn.functional', 
     'torch_geometric',
     'torch_scatter',
-    'torch-sparse',
-    'torch-cluster', 
-    'torch-spline-conv',
+    'torch_sparse',      
+    'torch_cluster',    
+    'torch_spline_conv', 
     'harmony'
 ]
 
