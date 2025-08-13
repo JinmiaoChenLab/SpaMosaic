@@ -18,6 +18,7 @@ autodoc_mock_imports = [
     'torch',
     'torch.nn',
     'torch.nn.functional', 
+    'torch_geometric'
 ]
 
 extensions = [
