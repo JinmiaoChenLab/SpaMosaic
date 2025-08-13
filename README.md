@@ -46,4 +46,4 @@ Please refer to the documentation: [https://spamosaic.readthedocs.io/en/latest/]
 
 
 ## Reproducibility
-To reproduce the results of SpaMosaic and compared methods, please check the code under the [`reproduce` tag](https://github.com/JinmiaoChenLab/SpaMosaic/tree/reproduce) in this repository.
+To reproduce the results of SpaMosaic and the compared methods, please use the code on the [`SpaMosaic-reproduce`](https://github.com/JinmiaoChenLab/SpaMosaic/tree/SpaMosaic-reproduce) branch.
