@@ -1,9 +1,9 @@
-from . import architectures
-from . import configs
-from . import build_graph
-from . import framework
-from . import loss
-from . import MNN
-from . import preprocessing
-from . import train_utils
-from . import utils
+import spamosaic.architectures.wlgcn
+import spamosaic.configs
+import spamosaic.build_graph
+import spamosaic.framework
+import spamosaic.loss
+import spamosaic.MNN
+import spamosaic.preprocessing
+import spamosaic.train_utils
+import spamosaic.utils
