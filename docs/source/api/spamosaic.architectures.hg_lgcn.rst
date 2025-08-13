@@ -1,4 +1,4 @@
-﻿spamosaic.architectures.hg\_lgcn
+﻿spamosaic.architectures.hg_lgcn
 ================================
 
 .. automodule:: spamosaic.architectures.hg_lgcn
