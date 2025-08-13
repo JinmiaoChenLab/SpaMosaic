@@ -19,10 +19,10 @@
    :nosignatures:
 
 
-   mnn
-   nn
-   nn_annoy
-   nn_approx
+   spamosaic.MNN.mnn
+   spamosaic.MNN.nn
+   spamosaic.MNN.nn_annoy
+   spamosaic.MNN.nn_approx
 
 
 
