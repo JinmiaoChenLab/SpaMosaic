@@ -28,3 +28,7 @@ dependencies = [
     "networkx>=3.1",
     "scipy>=1.10.1"
 ]
+
+[tool.setuptools.packages.find]
+include = ["spamosaic*"] 
+exclude = ["demo*"]      
