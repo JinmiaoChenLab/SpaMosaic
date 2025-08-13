@@ -2,3 +2,6 @@
 version: 2
 sphinx:
   configuration: docs/source/conf.py
+
+build:
+  os: ubuntu-20.04
