@@ -7,13 +7,13 @@ Code and data to reproduce the **mosaic integration** benchmarking results in ou
 ## Contents
 
 - `code/`
-  - `run_methods/`: method-specific notebooks and scripts (BANKSY, CellCharter, CLUE, Cobolt, MIDAS, MultiVI, scMoMaT, StabMap, UINMF, SpaMosaic, and utilities for a non-spatial variant).  
+  - `run_methods/`: method-specific notebooks and scripts (Cobolt, BANKSY, etc.).  
     Each subfolder contains end-to-end examples per dataset/task (e.g., `Simulations`, `Lymph-S1-S2-S3`, `Mux-VisiumHD-HE`, etc.).
-  - `compute_metrics/`: ARI, iLISI, PAS/CHAOS, FOSCTTM, MS, PCC, AUROC, and CMD (`metrics.py` and ready-to-run notebooks).
+  - `compute_metrics/`: ARI, iLISI, PAS, CHAOS, etc. (`metrics.py` and ready-to-run notebooks).
   - `plot_examples/`: quick UMAP and spatial cluster plotting examples.
 - `data/`
   - `processed/`: curated AnnData/H5AD objects for each dataset.
-  - `raw/`: raw outputs or original structure snapshots for selected datasets (Visium-like outputs, peaks, images, scalefactors, etc.).
+  - `raw/`: raw outputs or original structure snapshots for selected datasets (Visium-like outputs, images, etc.).
 - `results/`
   - `clusters/`: cluster labels.
   - `embeddings/`: low-dimensional embeddings from all methods.
@@ -34,7 +34,7 @@ Code and data to reproduce the **mosaic integration** benchmarking results in ou
 3. **Evaluate**  
    Use `code/compute_metrics` to compute:  
    - **Clustering**: ARI, PAS, CHAOS  
-   - **Integration**: iLISI, modality alignment scores
+   - **Integration**: iLISI, FOSCTTM, MS
    - **Imputation**: PCC, AUROC, CMD
 
 4. **Visualize**  
