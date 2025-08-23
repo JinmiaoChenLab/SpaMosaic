@@ -1,0 +1,4 @@
+include README.md LICENSE
+include environment.yml
+include pyproject.toml
+recursive-include spamosaic *.yaml
