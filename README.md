@@ -32,6 +32,16 @@ pip install harmony-pytorch --no-deps
 pip install spamosaic
 ```
 
+### 3. Development (dev) version
+
+The **dev build** differs from the stable release in two key ways:
+
+- **Sparse message passing.** Message passing uses `torch_sparse.SparseTensor` for the adjacency, making training on **large graphs** more memory-efficient.
+- **Decoupled training.** Graph message passing is separated from the training loop for cleaner modularity.
+
+See the [dev branch](https://github.com/JinmiaoChenLab/SpaMosaic/tree/dev) for installation and usage.
+
+
 ## Tutorials
 We provide detailed tutorials on applying SpaMosaic to various integration and imputation tasks.  
 Please refer to the documentation: [https://spamosaic.readthedocs.io/en/latest/](https://spamosaic.readthedocs.io/en/latest/)
