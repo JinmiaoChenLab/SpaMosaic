@@ -45,7 +45,7 @@ Code and data to reproduce the **mosaic integration** benchmarking results in ou
 ## Resources
 
 ### Data Availability  
-All data used in the experiments are publicly available on [Zenodo](https://zenodo.org/records/16813383).  
+All data used in the experiments are publicly available on [Zenodo](https://zenodo.org/records/16925549).  
 
 ### Compared Methods (official repos/tutorials)  
 > We list all **compared** baselines here (excluding SpaMosaic and Leiden).
