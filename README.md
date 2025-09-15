@@ -16,7 +16,7 @@ conda activate spamosaic-env
 
 ### 2. Install core dependencies
 Choose the PyTorch and PyTorch Geometric build that matches your local CUDA toolkit or driver.  
-For other versions (including CPU-only builds), please refer to the [documentation](https://spamosaic.readthedocs.io/en/latest/).
+For other versions (including CPU-only builds), please refer to the [documentation](https://spamosaic.readthedocs.io/en/dev/).
 
 **Example: PyTorch 2.0.0 with CUDA 11.7**
 ```bash

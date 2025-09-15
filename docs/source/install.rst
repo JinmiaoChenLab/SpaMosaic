@@ -10,7 +10,7 @@ Clone the GitHub repository and navigate into the project directory:
 
 .. code-block:: bash
 
-   git clone https://github.com/JinmiaoChenLab/SpaMosaic.git
+   git clone -b dev --single-branch https://github.com/JinmiaoChenLab/SpaMosaic.git
    cd SpaMosaic
 
 Create a new conda environment and activate it:
@@ -59,9 +59,9 @@ Install core dependencies
      https://data.pyg.org/whl/
 
 ------------
-Install SpaMosaic
+Install SpaMosaic in editable (dev) mode
 ------------
 
 .. code-block:: bash
 
-   pip install spamosaic
+   pip install -e .
