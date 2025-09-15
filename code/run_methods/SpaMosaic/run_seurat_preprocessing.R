@@ -39,7 +39,7 @@
 run_seurat_cca_integration <- function(
   expr_mat,
   expr_meta,
-  project   = "RNA",
+  # project   = "RNA",
   split_by  = "Sample",
   transpose = TRUE
 ){
